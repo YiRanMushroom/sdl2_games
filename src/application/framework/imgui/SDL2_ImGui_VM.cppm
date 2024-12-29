@@ -138,7 +138,7 @@ namespace application {
 
         void preEventListening() {
             for (currentIterator = layers.begin(); currentIterator != layers.end(); ++currentIterator) {
-                if (*currentIterator)
+                if ((*currentIterator)->enabled())
                     (*currentIterator)->preEventListening(*this);
             }
         }
@@ -149,7 +149,7 @@ namespace application {
                 bool handled = false;
 
                 for (currentIterator = layers.begin(); currentIterator != layers.end(); ++currentIterator) {
-                    if (*currentIterator)
+                    if ((*currentIterator)->enabled())
                         handled = (*currentIterator)->handle(event, handled, *this);
                 }
             }
@@ -157,7 +157,7 @@ namespace application {
 
         void postEventListening() {
             for (currentIterator = layers.begin(); currentIterator != layers.end(); ++currentIterator) {
-                if (*currentIterator)
+                if ((*currentIterator)->enabled())
                     (*currentIterator)->postEventListening(*this);
             }
         }
@@ -165,7 +165,7 @@ namespace application {
         void render() {
             for (currentReverseIterator = layers.rbegin(); currentReverseIterator != layers.rend();
                  ++currentReverseIterator) {
-                if (*currentReverseIterator)
+                if ((*currentReverseIterator)->enabled())
                     (*currentReverseIterator)->render(*this);
             }
         }

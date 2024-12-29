@@ -218,8 +218,6 @@ public:
     }
 
     SDL_Rect buildCentered() const {
-        auto [windowWidth, windowHeight] = this->getWindowSize();
-
         return {
             (x - width / 2),
             (y - height / 2),

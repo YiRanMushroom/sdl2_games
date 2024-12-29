@@ -38,253 +38,254 @@ namespace application {
     };
 
     export class ContextEventListener {
-    protected:
-        virtual bool onFirstEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+    public:
+        virtual ~ContextEventListener() = default;
+
+        virtual bool onFirstEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onQuit(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onQuit(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onAppTerminating(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onAppTerminating(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onAppLowMemory(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onAppLowMemory(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onAppWillEnterBackground(const SDL_Event &, bool original,
-                                              IVirtualMachineContextProvider &provider) { return original; }
+        virtual bool onAppWillEnterBackground(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
+            return original;
+        }
 
         virtual bool
-        onAppDidEnterBackground(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        onAppDidEnterBackground(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool onAppWillEnterForeground(const SDL_Event &, bool original,
-                                              IVirtualMachineContextProvider &provider) { return original; }
+                                              IVirtualMachineContextProvider &) { return original; }
 
         virtual bool
-        onAppDidEnterForeground(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        onAppDidEnterForeground(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onLocaleChanged(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onLocaleChanged(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDisplayEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDisplayEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onWindowEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onWindowEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onSysWMEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onSysWMEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onKeyDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onKeyDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onKeyUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onKeyUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onTextEditing(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onTextEditing(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onTextInput(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onTextInput(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onKeyMapChanged(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onKeyMapChanged(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onTextEditingExt(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onTextEditingExt(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onMouseMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onMouseMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onMouseButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onMouseButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onMouseButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onMouseButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onMouseWheel(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onMouseWheel(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyAxisMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyAxisMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyBallMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyBallMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyHatMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyHatMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyDeviceRemoved(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyDeviceRemoved(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onJoyBatteryUpdated(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
-            return original;
-        }
-
-        virtual bool
-        onControllerAxisMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onJoyBatteryUpdated(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool
-        onControllerButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
-            return original;
-        }
-
-        virtual bool onControllerButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        onControllerAxisMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool
-        onControllerDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        onControllerButtonDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
+            return original;
+        }
+
+        virtual bool onControllerButtonUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
+            return original;
+        }
+
+        virtual bool
+        onControllerDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool onControllerDeviceRemoved(const SDL_Event &, bool original,
-                                               IVirtualMachineContextProvider &provider) { return original; }
+                                               IVirtualMachineContextProvider &) { return original; }
 
         virtual bool onControllerDeviceRemapped(const SDL_Event &, bool original,
-                                                IVirtualMachineContextProvider &provider) { return original; }
+                                                IVirtualMachineContextProvider &) { return original; }
 
         virtual bool onControllerTouchPadDown(const SDL_Event &, bool original,
-                                              IVirtualMachineContextProvider &provider) { return original; }
+                                              IVirtualMachineContextProvider &) { return original; }
 
         virtual bool onControllerTouchPadMotion(const SDL_Event &, bool original,
-                                                IVirtualMachineContextProvider &provider) { return original; }
+                                                IVirtualMachineContextProvider &) { return original; }
 
         virtual bool
-        onControllerTouchPadUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        onControllerTouchPadUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool onControllerSensorUpdate(const SDL_Event &, bool original,
-                                              IVirtualMachineContextProvider &provider) { return original; }
+                                              IVirtualMachineContextProvider &) { return original; }
 
         virtual bool onControllerUpdateCompleteReservedForSDL3(const SDL_Event &, bool original,
-                                                               IVirtualMachineContextProvider &provider) {
+                                                               IVirtualMachineContextProvider &) {
             return original;
         }
 
         virtual bool onControllerSteamHandleUpdated(const SDL_Event &, bool original,
-                                                    IVirtualMachineContextProvider &provider) { return original; }
+                                                    IVirtualMachineContextProvider &) { return original; }
 
-        virtual bool onFingerDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onFingerDown(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onFingerUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onFingerUp(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onFingerMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onFingerMotion(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDollarGesture(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDollarGesture(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDollarRecord(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDollarRecord(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onMultiGesture(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onMultiGesture(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onClipboardUpdate(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onClipboardUpdate(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDropFile(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDropFile(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDropText(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDropText(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDropBegin(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDropBegin(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onDropComplete(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onDropComplete(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onAudioDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onAudioDeviceAdded(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onAudioDeviceRemoved(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onAudioDeviceRemoved(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onSensorUpdate(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onSensorUpdate(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onRenderTargetsReset(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onRenderTargetsReset(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onRenderDeviceReset(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onRenderDeviceReset(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onPollSentinel(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onPollSentinel(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onUserEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onUserEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
-        virtual bool onLastEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &provider) {
+        virtual bool onLastEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
         }
 
     public:
-        virtual ~ContextEventListener() = default;
-
         virtual bool handle(const SDL_Event &event, bool prevHandled, IVirtualMachineContextProvider &provider) {
             switch (event.type) {
                 case SDL_FIRSTEVENT: return onFirstEvent(event, prevHandled, provider);
@@ -357,9 +358,7 @@ namespace application {
 }
 
 namespace application {
-    // shared_ptr<SDL2_EventListener> identityEventListener = make_shared<IdentitySDL2_EventListener>();
-
-    enum class LayerState : int8_t {
+    export enum class LayerState : int8_t {
         enabled,
         disabled,
     };
@@ -377,6 +376,8 @@ namespace application {
         LayerState m_state = LayerState::enabled;
 
     public:
+        ~WorkableLayer() override = default;
+
         WorkableLayer() = default;
 
         WorkableLayer(const WorkableLayer &) = delete;
@@ -387,13 +388,17 @@ namespace application {
             return m_state;
         }
 
-        void virtual preEventListening(IVirtualMachineContextProvider&) {}
+        void virtual preEventListening(IVirtualMachineContextProvider &) {}
 
-        void virtual postEventListening(IVirtualMachineContextProvider&) {}
+        void virtual postEventListening(IVirtualMachineContextProvider &) {}
 
-        void virtual render(IVirtualMachineContextProvider&) {}
+        void virtual render(IVirtualMachineContextProvider &) {}
 
-        operator bool() const { // NOLINT(*-explicit-constructor)
+        virtual operator bool() const { // NOLINT(*-explicit-constructor)
+            return m_state == LayerState::enabled;
+        }
+
+        [[nodiscard]] virtual bool enabled() const {
             return m_state == LayerState::enabled;
         }
     };

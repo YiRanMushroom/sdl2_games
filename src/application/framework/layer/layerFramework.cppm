@@ -18,6 +18,8 @@ namespace application {
         vector<unique_ptr<application::IMouseInteractableComponent> > mouseInteractableComponents;
 
     public:
+        virtual ~MouseComponentAutoHandledLayer() = default;
+
         bool onMouseMotion(const SDL_Event &event, bool original, IVirtualMachineContextProvider &provider) override {
             for (auto &component: mouseInteractableComponents) {
                 original |= component->onMouseMoved(event.motion.x, event.motion.y, provider);

@@ -24,7 +24,7 @@ import applicationResources;
 import appMenuLayer;
 import applicationBasicLayers;
 
-int application_main(int argc, char *argv[]) {
+int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     loadApplicationSettings();
 
     auto vm = application::SDL2_ImGUi_VM_Factory{}

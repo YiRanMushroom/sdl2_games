@@ -10,27 +10,26 @@ namespace application {
     public:
         virtual ~IMouseInteractableComponent() = default;
 
-        virtual bool onMouseMoved(int x, int y, IVirtualMachineContextProvider &) {
+        virtual bool onMouseMoved(int, int, IVirtualMachineContextProvider &) {
             return false;
         }
 
-        virtual bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider &) {
+        virtual bool onMouseButtonDown(int, int, int, IVirtualMachineContextProvider &) {
             return false;
         }
 
-        virtual bool onMouseButtonUp(int x, int y, int button, IVirtualMachineContextProvider &) {
+        virtual bool onMouseButtonUp(int, int, int, IVirtualMachineContextProvider &) {
             return false;
         }
 
-        virtual bool onMouseWheel(int x, int y, unsigned int direction, IVirtualMachineContextProvider &) {
+        virtual bool onMouseWheel(int, int, unsigned int, IVirtualMachineContextProvider &) {
             return false;
         }
 
-        virtual bool onWindowSizeChanged(int width, int height, IVirtualMachineContextProvider &) {
+        virtual bool onWindowSizeChanged(int, int, IVirtualMachineContextProvider &) {
             return false;
         }
 
-        virtual void onRender(IVirtualMachineContextProvider &provider) {}
+        virtual void onRender(IVirtualMachineContextProvider &) {}
     };
 }
-

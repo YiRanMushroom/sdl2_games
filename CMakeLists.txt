@@ -22,6 +22,8 @@ file(GLOB_RECURSE CPP_FILES src/*.cpp)
 
 file(GLOB_RECURSE PCH_FILES src/headers/*.pch)
 
+add_compile_options(-Wall -Wextra -Wpedantic)
+
 add_executable(${PROJECT_NAME}
         ${SRC_FILES}
         src/application/framework/layer/workableLayer.cppm

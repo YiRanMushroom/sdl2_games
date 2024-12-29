@@ -79,7 +79,7 @@ namespace application {
                                                            .buildCentered()
                                                        ) {}
 
-        virtual bool onMouseMoved(int x, int y, IVirtualMachineContextProvider &provider) override {
+        virtual bool onMouseMoved(int x, int y, IVirtualMachineContextProvider &) override {
             if (state == ButtonState::Clicked) {
                 return false;
             }
@@ -93,7 +93,7 @@ namespace application {
             return false;
         }
 
-        virtual bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider &provider) override {
+        virtual bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider &) override {
             if (SDL2_PointCollideWithRect(x, y, region)) {
                 state = ButtonState::Clicked;
                 onClick(button);
@@ -102,7 +102,7 @@ namespace application {
             return false;
         }
 
-        virtual bool onMouseButtonUp(int x, int y, int button, IVirtualMachineContextProvider &provider) override {
+        virtual bool onMouseButtonUp(int x, int y, int, IVirtualMachineContextProvider &) override {
             if (state == ButtonState::Clicked) {
                 state = SDL2_PointCollideWithRect(x, y, region) ? ButtonState::Hovered : ButtonState::Default;
             }
@@ -127,7 +127,7 @@ namespace application {
             SDL2_RenderTextureRect(provider.getRenderer(), fontTexture, region);
         }
 
-        virtual bool onWindowSizeChanged(int windowWidth, int windowHeight,
+        virtual bool onWindowSizeChanged(int, int,
                                          IVirtualMachineContextProvider &provider) override {
             region = SDL2_RectBuilder(provider.getWindow())
                     .ofRelativePosition(xRatio, yRatio)

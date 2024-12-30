@@ -25,7 +25,7 @@ import appMenuLayer;
 import applicationBasicLayers;
 
 int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-    loadApplicationSettings();
+    application::loadApplicationSettings();
 
     auto vm = application::SDL2_ImGUi_VM_Factory{}
             .title("ImGui + SDL2 Test")
@@ -46,8 +46,6 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
     layers.push_back(make_unique<application::BasicFrameworkLayer>());
 
-    FontHolder holder{"resources/fonts/Open_Sans/static/OpenSans-Regular.ttf"};
-
     while (application::isRunning) { // NOLINT
         vm.preEventListening();
 
@@ -66,7 +64,7 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
     application::unloadApplicationResources();
 
-    saveApplicationSettings();
+    application::saveApplicationSettings();
 
     return 0;
 }

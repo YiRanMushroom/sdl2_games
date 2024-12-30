@@ -1,8 +1,8 @@
 module;
 
-#include <SDL2/SDL.h>
 #include <utility>
 #include <iterator>
+#include <AppMacros.h>
 
 export module appMenuLayer;
 
@@ -15,59 +15,53 @@ import applicationResources;
 import std_overloads;
 import applicationSharedState;
 import selectGameLayer;
+import applicationConstants;
 
 namespace application {
-    export class AppMenuLayer : public application::MouseComponentAutoHandledLayer {
+    export class AppMenuLayer extends public application::BasicMouseHandledLayer {
     public:
         AppMenuLayer(IVirtualMachineContextProvider &provider) {
-            auto &&fontHolder = *application::openSansHolder;
-            fontHolder.loadFont(50);
-            auto selectGameTexture = fontHolder.getTextureBlended(50, "Select Game", SDL_Color{191, 191, 191, 255},
-                                                                  provider.getRenderer());
-            auto configTexture = fontHolder.getTextureBlended(50, "Config", SDL_Color{191, 191, 191, 255},
-                                                              provider.getRenderer());
-            auto exitTexture = fontHolder.getTextureBlended(50, "Exit", SDL_Color{191, 191, 191, 255},
-                                                            provider.getRenderer());
+            auto selectGameButton = SimpleConstantTextButtonFactory{}
+                    .withText("Select Game")
+                    .withRelativePosition(0.5, 0.4)
+                    .withRelativeHeight(0.1)
+                    .whenPopUp([&provider, this](int button) {
+                        AppLogMessage("Select Game: Button clicked with button: {}"_fmt(button));
 
-            mouseInteractableComponents.emplace_back(
-                make_unique<SimpleConstantTextButton>(0.5, 0.4, 0.1, selectGameTexture.getAspectRatio(),
-                                                      SDL_Color{0, 0, 0, 0}, std::move(selectGameTexture),
-                                                      [&](int button) {
-                                                          AppLogMessage(
-                                                              "Select Game: Button clicked with button: {}"_fmt(
-                                                                  button));
+                        this->m_state = LayerState::disabled;
 
-                                                          if (button == 1) {
-                                                              this->m_state = LayerState::disabled;
-                                                          }
+                        provider.getDeferredTasks().emplace(
+                            [&provider, currentIterator = provider.getCurrentIterator(), this] {
+                                provider.getLayers().insert(
+                                    std::next(currentIterator),
+                                    make_unique<SelectGameLayer>(provider, [this] {
+                                        this->m_state = LayerState::enabled;
+                                    }));
+                            });
+                    })
+                    .build(provider.getRenderer(), provider.getWindow());
+            registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(selectGameButton)));
 
-                                                          provider.getDeferredTasks().emplace([&provider, this,
-                                                              currentIterator = provider.getCurrentIterator()] {
-                                                              provider.getLayers().insert(
-                                                                  std::next(currentIterator),
-                                                                  make_unique<SelectGameLayer>(provider, [&] {
-                                                                      this->m_state = LayerState::enabled;
-                                                                  })
-                                                              );
-                                                          });
-                                                      }, provider.getRenderer(), provider.getWindow()));
+            auto configButton = SimpleConstantTextButtonFactory{}
+                    .withText("Config")
+                    .withRelativePosition(0.5, 0.5)
+                    .withRelativeHeight(0.1)
+                    .whenPopUp([](int button) {
+                        AppLogMessage("Config: Button clicked with button: {}"_fmt(button));
+                    })
+                    .build(provider.getRenderer(), provider.getWindow());
+            registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(configButton)));
 
-            mouseInteractableComponents.emplace_back(
-                make_unique<SimpleConstantTextButton>(0.5, 0.5, 0.1, configTexture.getAspectRatio(),
-                                                      SDL_Color{0, 0, 0, 0}, std::move(configTexture),
-                                                      [](int button) {
-                                                          AppLogMessage(
-                                                              "Config: Button clicked with button: {}"_fmt(button));
-                                                      }, provider.getRenderer(), provider.getWindow()));
-
-            mouseInteractableComponents.emplace_back(
-                make_unique<SimpleConstantTextButton>(0.5, 0.6, 0.1, exitTexture.getAspectRatio(),
-                                                      SDL_Color{0, 0, 0, 0}, std::move(exitTexture),
-                                                      [](int button) {
-                                                          AppLogMessage(
-                                                              "Exit: Button clicked with button: {}"_fmt(button));
-                                                          application::isRunning = false;
-                                                      }, provider.getRenderer(), provider.getWindow()));
+            auto exitButton = SimpleConstantTextButtonFactory{}
+                    .withText("Exit")
+                    .withRelativePosition(0.5, 0.6)
+                    .withRelativeHeight(0.1)
+                    .whenPopUp([](int button) {
+                        AppLogMessage("Exit: Button clicked with button: {}"_fmt(button));
+                        application::isRunning = false;
+                    })
+                    .build(provider.getRenderer(), provider.getWindow());
+            registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(exitButton)));
         }
     };
 }

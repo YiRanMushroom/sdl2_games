@@ -62,7 +62,7 @@ export class Texture {
 public:
     Texture(const Texture &) = delete;
 
-    Texture() = delete;
+    Texture() = default;
 
     Texture(unique_ptr<SDL_Texture, SDL2_TextureDestructor> texture, int32_t width, int32_t height)
         : texture(std::move(texture)), width(width), height(height) {}

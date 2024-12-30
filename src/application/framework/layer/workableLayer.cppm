@@ -37,9 +37,9 @@ namespace application {
         virtual LayerListReverseIterator &getCurrentReverseIterator() = 0;
     };
 
-    export class ContextEventListener {
+    export interface IContextEventListener {
     public:
-        virtual ~ContextEventListener() = default;
+        virtual ~IContextEventListener() = default;
 
         virtual bool onFirstEvent(const SDL_Event &, bool original, IVirtualMachineContextProvider &) {
             return original;
@@ -355,6 +355,14 @@ namespace application {
             }
         }
     };
+
+    export interface IRenderable {
+        virtual ~IRenderable() = default;
+
+        virtual void render(IVirtualMachineContextProvider &) {
+
+        }
+    };
 }
 
 namespace application {
@@ -371,7 +379,7 @@ namespace application {
     // 4. render
     // 5. the state of the layer
 
-    export class WorkableLayer extends public ContextEventListener {
+    export class WorkableLayer implements public IContextEventListener, public IRenderable {
     protected:
         LayerState m_state = LayerState::enabled;
 
@@ -391,8 +399,6 @@ namespace application {
         void virtual preEventListening(IVirtualMachineContextProvider &) {}
 
         void virtual postEventListening(IVirtualMachineContextProvider &) {}
-
-        void virtual render(IVirtualMachineContextProvider &) {}
 
         virtual operator bool() const { // NOLINT(*-explicit-constructor)
             return m_state == LayerState::enabled;

@@ -13,8 +13,10 @@ import Buttons;
 import applicationResources;
 import std_overloads;
 import applicationSharedState;
+import applicationConstants;
+
 namespace application {
-    export class SelectGameLayer : public application::MouseComponentAutoHandledLayer {
+    export class SelectGameLayer : public application::BasicMouseHandledLayer {
         function<void()> m_onDestruct;
 
     public:
@@ -31,22 +33,23 @@ namespace application {
         SelectGameLayer(IVirtualMachineContextProvider &provider, function<void()> destructor) : m_onDestruct(
             std::move(destructor)) {
             auto &&fontHolder = *application::openSansHolder;
-            auto texture = fontHolder.getTextureBlended(50, "SNAKE", SDL_Color{191, 191, 191, 191},
+            auto texture = fontHolder.getTextureBlended(50, "SNAKE", constants::default_font_color,
                                                         provider.getRenderer());
 
-            mouseInteractableComponents.emplace_back(
-                make_unique<SimpleConstantTextButton>(0.5, 0.2, 0.1, texture.getAspectRatio(),
-                                                      SDL_Color{0, 0, 0, 0}, std::move(texture),
-                                                      [&]
-                                              (int button) {
-                                                          AppLogMessage(
-                                                              "Snake: Button clicked with button: {}"_fmt(button));
-                                                          provider.getDeferredTasks().emplace(
-                                                              [&provider, currentIterator = provider.
-                                                                  getCurrentIterator()] {
-                                                                  provider.getLayers().erase(currentIterator);
-                                                              });
-                                                      }, provider.getRenderer(), provider.getWindow()));
+            auto shared = make_shared<SimpleConstantTextButton>
+            (0.5, 0.2, 0.1, texture.getAspectRatio(),
+             constants::default_button_color, std::move(texture),
+             [&](int button) {
+                 AppLogMessage(
+                     "Snake: Button clicked with button: {}"_fmt(button));
+                 provider.getDeferredTasks().emplace(
+                     [&provider, currentIterator = provider.
+                         getCurrentIterator()] {
+                         provider.getLayers().erase(currentIterator);
+                     });
+             }, provider.getRenderer(), provider.getWindow());
+
+            registerBasicMouseRenderableComponents(shared);
         }
     };
 }

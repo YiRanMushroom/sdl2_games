@@ -149,6 +149,8 @@ namespace application {
                 bool handled = false;
 
                 for (currentIterator = layers.begin(); currentIterator != layers.end(); ++currentIterator) {
+                    if (handled)
+                        break;
                     if ((*currentIterator)->enabled())
                         handled = (*currentIterator)->handle(event, handled, *this);
                 }

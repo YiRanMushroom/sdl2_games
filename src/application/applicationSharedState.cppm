@@ -6,6 +6,6 @@ export module applicationSharedState;
 
 export namespace application {
     bool isRunning = true;
-    bool isDemoWindowVisible = true;
+    bool isDebugWindowVisible = true;
     bool ignoreImGuiEventHandlingResult = true;
 }

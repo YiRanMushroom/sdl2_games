@@ -14,6 +14,7 @@ import applicationResources;
 import std_overloads;
 import applicationSharedState;
 import applicationConstants;
+import snakeGameLayer;
 
 namespace application {
     export class SelectGameLayer : public application::BasicMouseHandledLayer {
@@ -21,9 +22,9 @@ namespace application {
 
     public:
         virtual ~SelectGameLayer() override {
-            if (m_onDestruct) {
-                m_onDestruct();
-            }
+            // if (m_onDestruct) {
+            //     m_onDestruct();
+            // }
         }
 
         SelectGameLayer(const SelectGameLayer &) = delete;
@@ -44,7 +45,10 @@ namespace application {
                      "Snake: Button clicked with button: {}"_fmt(button));
                  provider.getDeferredTasks().emplace(
                      [&provider, currentIterator = provider.
-                         getCurrentIterator()] {
+                         getCurrentIterator(), this] {
+                         provider.getLayers().insert(
+                             currentIterator,
+                             make_unique<SnakeGameLayer>(std::move(m_onDestruct), provider));
                          provider.getLayers().erase(currentIterator);
                      });
              }, provider.getRenderer(), provider.getWindow());

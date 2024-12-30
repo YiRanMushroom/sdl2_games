@@ -7,33 +7,34 @@ import json;
 import fileUtilities;
 import applicationSharedState;
 import std_overloads;
-
+import snakeGameConfig;
 
 namespace application {
-    void loadUIStates() {
-        auto [ex, ifs] = openFileInput("saves/uiStates.json");
-
-        auto j = jsonutil::parse_no_throw(ifs);
-
-        application::isDemoWindowVisible =
-                j["isDemoWindowVisible"] | jsonutil::get_or_default(true);
+    void loadUIStates(json &j) {
+        application::isDebugWindowVisible =
+                j["ui"]["isDebugWindowVisible"] | jsonutil::get_or_default(true);
     }
 
-
-    void saveUIStates() {
-        json j;
-        j["isDemoWindowVisible"] = application::isDemoWindowVisible;
-
-        auto [ex, ofs] = openFileOutput("saves/uiStates.json");
-
-        ofs << j.dump(4);
+    void saveUIStates(json &j) {
+        j["ui"]["isDebugWindowVisible"] = application::isDebugWindowVisible;
     }
 
     export void loadApplicationSettings() {
-        loadUIStates();
+        auto [ex, ifs] = openFileInput("saves/configs.json");
+
+        auto j = jsonutil::parse_no_throw(ifs);
+
+        loadUIStates(j);
+        loadSnakeGameSettings(j);
     }
 
     export void saveApplicationSettings() {
-        saveUIStates();
+        json j;
+        saveSnakeGameSettings(j);
+        saveUIStates(j);
+
+        auto [ex, ofs] = openFileOutput("saves/configs.json");
+
+        ofs << j.dump(4);
     }
 }

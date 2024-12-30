@@ -5,7 +5,7 @@ module;
 #include <utility>
 
 export module json;
-import std_overloads;
+export import std_overloads;
 
 export using nlohmann::json;
 

@@ -3,6 +3,7 @@ module;
 #include <utility>
 #include <iterator>
 #include <AppMacros.h>
+#include <imgui.h>
 
 export module appMenuLayer;
 
@@ -16,10 +17,15 @@ import std_overloads;
 import applicationSharedState;
 import selectGameLayer;
 import applicationConstants;
+import imguiWindows;
 
 namespace application {
     export class AppMenuLayer extends public application::BasicMouseHandledLayer {
     public:
+        shared_ptr<string> imGuiWindowHolder;
+
+        inline static bool imguiWindowOpen;
+
         AppMenuLayer(IVirtualMachineContextProvider &provider) {
             auto selectGameButton = SimpleConstantTextButtonFactory{}
                     .withText("Select Game")
@@ -62,6 +68,10 @@ namespace application {
                     })
                     .build(provider.getRenderer(), provider.getWindow());
             registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(exitButton)));
+
+            imGuiWindowHolder = addImGuiDisplayWindow("appMenuLayer", &imguiWindowOpen, [](bool *) {
+                ImGui::Text("Welcome to the Game Launcher!");
+            });
         }
     };
 }

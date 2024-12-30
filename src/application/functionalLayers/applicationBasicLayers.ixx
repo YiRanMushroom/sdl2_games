@@ -15,6 +15,7 @@ import applicationSharedState;
 import imguiUtilities;
 import std_overloads;
 import applicationConstants;
+import imguiWindows;
 
 namespace application {
     export class BasicFrameworkLayer extends public WorkableLayer {
@@ -45,7 +46,7 @@ namespace application {
             if (event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_F9:
-                        application::isDemoWindowVisible = !application::isDemoWindowVisible;
+                        application::isDebugWindowVisible = !application::isDebugWindowVisible;
                         handled = true;
                         break;
 
@@ -69,8 +70,8 @@ namespace application {
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
 
-            if (application::isDemoWindowVisible) {
-                ImGui::ShowDemoWindow(&application::isDemoWindowVisible);
+            if (application::isDebugWindowVisible) {
+                ShowDebugWindow(&application::isDebugWindowVisible);
             }
 
             // ImGui Layer

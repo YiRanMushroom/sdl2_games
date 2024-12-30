@@ -26,10 +26,14 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_executable(${PROJECT_NAME}
         ${SRC_FILES}
-        src/application/framework/layer/workableLayer.cppm
-        src/application/config/applicationConstants.cppm
-        src/application/functionalLayers/TopListenerLayer.cppm
-        src/application/components/Basic/IWindowSizeChangedListener.cppm
+        src/application/config/snakeGameConfig.cppm
+        src/application/utilities/randomGenerator.cppm
+        #        src/application/framework/layer/workableLayer.cppm
+#        src/application/config/applicationConstants.cppm
+#        src/application/functionalLayers/TopListenerLayer.cppm
+#        src/application/components/Basic/IWindowSizeChangedListener.cppm
+#        src/application/framework/imgui/imguiWindows.cppm
+#        src/application/functionalLayers/snakeGameLayer.cppm
         #        src/application/utilities/font/fontHolder.cppm
 #        src/application/framework/sdl2/SDL2_Utilities.cppm
 #        src/application/components/IComponent.cppm

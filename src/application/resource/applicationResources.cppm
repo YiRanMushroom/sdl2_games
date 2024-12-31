@@ -27,6 +27,9 @@ namespace application {
 
     export void unloadApplicationResources() {
         openSansHolder.reset();
+
+        Mix_HaltChannel(-1);
+        Mix_HaltMusic();
         mixChunks.clear();
     }
 }

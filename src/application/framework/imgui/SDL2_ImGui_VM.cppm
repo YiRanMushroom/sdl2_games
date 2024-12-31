@@ -11,6 +11,7 @@ module;
 #include <queue>
 
 #include <AppMacros.h>
+#include <SDL_image.h>
 
 export module SDL2_ImGui_VM;
 
@@ -32,6 +33,10 @@ struct SDL2_Context_Holder {
             if (TTF_Init() != 0) {
                 throw runtime_error(TTF_GetError());
             }
+
+            if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
+                throw runtime_error(IMG_GetError());
+            }
         } catch (const runtime_error &e) {
             std::cerr << "Error: " << e.what() << std::endl;
             throw e;
@@ -42,6 +47,7 @@ struct SDL2_Context_Holder {
 
     ~SDL2_Context_Holder() {
         std::cout << "SDL2 Quitting" << std::endl;
+        IMG_Quit();
         TTF_Quit();
         SDL_Quit();
     }

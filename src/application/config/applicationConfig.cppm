@@ -12,7 +12,7 @@ import snakeGameConfig;
 namespace application {
     void loadUIStates(json &j) {
         application::isDebugWindowVisible =
-                j["ui"]["isDebugWindowVisible"] | jsonutil::get_or_default(true);
+                j["ui"]["isDebugWindowVisible"] | jsonutil::get_or_default(false);
     }
 
     void saveUIStates(json &j) {

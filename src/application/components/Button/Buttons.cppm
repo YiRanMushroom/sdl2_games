@@ -15,22 +15,6 @@ import IComponent;
 import applicationConstants;
 import applicationResources;
 
-namespace application::__impl {
-    SDL_Color Get_Default_Hovered_Color(const SDL_Color &color) {
-        return SDL_Color{
-            static_cast<uint8_t>(color.r * 1.1), static_cast<uint8_t>(color.g * 1.1),
-            static_cast<uint8_t>(color.b * 1.1), color.a
-        };
-    }
-
-    SDL_Color Get_Default_Clicked_Color(const SDL_Color &color) {
-        return SDL_Color{
-            static_cast<uint8_t>(color.r * 0.9), static_cast<uint8_t>(color.g * 0.9),
-            static_cast<uint8_t>(color.b * 0.9), color.a
-        };
-    }
-}
-
 export enum class ButtonState {
     Default,
     Hovered,
@@ -74,11 +58,11 @@ namespace application {
                   SDL2_Create_Solid_Color_Texture(backGroundColor, renderer)),
               backgroundTextureHovered(
                   SDL2_Create_Solid_Color_Texture(
-                      application::__impl::Get_Default_Hovered_Color(
+                      application::colors::Brighter(
                           backGroundColor), renderer)),
               backgroundTextureClicked(
                   SDL2_Create_Solid_Color_Texture(
-                      application::__impl::Get_Default_Clicked_Color(
+                      application::colors::Darker(
                           backGroundColor),
                       renderer)), region(
                   SDL2_RectBuilder(window)
@@ -199,8 +183,8 @@ namespace application {
 
         decltype(auto) ofBackGroundColor(this auto &&self, SDL_Color backGroundColor) {
             self.backGroundColor = backGroundColor;
-            self.backGroundHoveredColor = application::__impl::Get_Default_Hovered_Color(backGroundColor);
-            self.backGroundClickedColor = application::__impl::Get_Default_Clicked_Color(backGroundColor);
+            self.backGroundHoveredColor = application::colors::Brighter(backGroundColor);
+            self.backGroundClickedColor = application::colors::Darker(backGroundColor);
             return self;
         }
 

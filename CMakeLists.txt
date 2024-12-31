@@ -24,10 +24,11 @@ file(GLOB_RECURSE PCH_FILES src/headers/*.pch)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_executable(${PROJECT_NAME}
+add_executable(${PROJECT_NAME} WIN32
         ${SRC_FILES}
-        src/application/config/snakeGameConfig.cppm
-        src/application/utilities/randomGenerator.cppm
+#        src/application/config/snakeGameConfig.cppm
+#        src/application/utilities/randomGenerator.cppm
+#        src/application/utilities/TextureAtlas.cppm
         #        src/application/framework/layer/workableLayer.cppm
 #        src/application/config/applicationConstants.cppm
 #        src/application/functionalLayers/TopListenerLayer.cppm
@@ -45,6 +46,8 @@ add_executable(${PROJECT_NAME}
 #        src/application/framework/accessors/virtualMachineContextProvider.cppm
 #        src/headers/AppMacros.h
 )
+
+
 
 target_include_directories(${PROJECT_NAME} PRIVATE src/headers)
 #
@@ -84,3 +87,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE imgui::imgui)
 # nlohmann_json
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+# SDL2_image
+
+find_package(SDL2_image CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>)
+
+# SDL2_mixer
+
+find_package(SDL2_mixer CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)

@@ -111,6 +111,11 @@ export void SDL2_RenderTextureRect(SDL_Renderer *renderer, const Texture &textur
     SDL_RenderCopy(renderer, texture.get(), nullptr, &rect);
 }
 
+export void SDL2_RenderTextureClippedRect(SDL_Renderer *renderer, const Texture &texture, const SDL_Rect &clip,
+                                          const SDL_Rect &rect) {
+    SDL_RenderCopy(renderer, texture.get(), &clip, &rect);
+}
+
 export Texture SDL2_Create_Solid_Color_Texture(SDL_Color color,
                                                SDL_Renderer *renderer, int width = 128, int height = 128) {
     // Create an SDL_Surface with the specified width, height, and color depth
@@ -229,3 +234,74 @@ public:
         return {x, y, width, height};
     }
 };
+
+export class SharedTexture {
+    shared_ptr<SDL_Texture> texture;
+    int32_t width{};
+    int32_t height{};
+
+public:
+    SharedTexture(const SharedTexture &) = default;
+
+    SharedTexture() = default;
+
+private:
+    SharedTexture(shared_ptr<SDL_Texture> texture, int32_t width, int32_t height)
+        : texture(std::move(texture)), width(width), height(height) {}
+
+public:
+    SharedTexture &operator=(const SharedTexture &) = default;
+
+    SharedTexture(SharedTexture &&) noexcept = default;
+
+    SharedTexture &operator=(SharedTexture &&) noexcept = default;
+
+    static SharedTexture LoadFromSurface(SDL_Renderer *renderer, SDL_Surface *surface) {
+        auto sdl_texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+        if (!sdl_texture) {
+            throw runtime_error(SDL_GetError());
+        }
+
+        return {
+            shared_ptr<SDL_Texture>{sdl_texture, SDL2_TextureDestructor{}},
+            surface->w, surface->h
+        };
+    }
+
+    [[nodiscard]] SDL_Texture *get() const {
+        return texture.get();
+    }
+
+    SDL_Texture *operator*() const {
+        return texture.get();
+    }
+
+    [[nodiscard]] int32_t getWidth() const {
+        return width;
+    }
+
+    [[nodiscard]] int32_t getHeight() const {
+        return height;
+    }
+
+    [[nodiscard]] float getAspectRatio() const {
+        return static_cast<float>(width) / height;
+    }
+};
+
+export namespace application::colors {
+    SDL_Color Brighter(const SDL_Color &color) {
+        return SDL_Color{
+            static_cast<uint8_t>(color.r * 1.1), static_cast<uint8_t>(color.g * 1.1),
+            static_cast<uint8_t>(color.b * 1.1), color.a
+        };
+    }
+
+    SDL_Color Darker(const SDL_Color &color) {
+        return SDL_Color{
+            static_cast<uint8_t>(color.r * 0.9), static_cast<uint8_t>(color.g * 0.9),
+            static_cast<uint8_t>(color.b * 0.9), color.a
+        };
+    }
+}

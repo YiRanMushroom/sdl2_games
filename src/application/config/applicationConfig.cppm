@@ -9,10 +9,11 @@ import applicationSharedState;
 import std_overloads;
 import snakeGameConfig;
 
-namespace application {
-    void loadUIStates(json &j) {
+namespace application::config {
+    void loadUIStates(const json &j) {
         application::isDebugWindowVisible =
-                j["ui"]["isDebugWindowVisible"] | jsonutil::get_or_default(false);
+            j | jsonutil::get_or_default("ui", "isDebugWindowVisible", false);
+                // j["ui"]["isDebugWindowVisible"] | jsonutil::get_or_default(false);
     }
 
     void saveUIStates(json &j) {
@@ -25,12 +26,12 @@ namespace application {
         auto j = jsonutil::parse_no_throw(ifs);
 
         loadUIStates(j);
-        loadSnakeGameSettings(j);
+        snakeGame::loadSnakeGameSettings(j);
     }
 
     export void saveApplicationSettings() {
         json j;
-        saveSnakeGameSettings(j);
+        snakeGame::saveSnakeGameSettings(j);
         saveUIStates(j);
 
         auto [ex, ofs] = openFileOutput("saves/configs.json");

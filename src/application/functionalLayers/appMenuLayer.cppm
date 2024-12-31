@@ -31,7 +31,7 @@ namespace application {
                     .withText("Select Game")
                     .withRelativePosition(0.5, 0.4)
                     .withRelativeHeight(0.1)
-                    .whenPopUp([&provider, this](int button) {
+                    .whenPressed([&provider, this](int button) {
                         AppLogMessage("Select Game: Button clicked with button: {}"_fmt(button));
 
                         this->m_state = LayerState::disabled;
@@ -52,7 +52,7 @@ namespace application {
                     .withText("Config")
                     .withRelativePosition(0.5, 0.5)
                     .withRelativeHeight(0.1)
-                    .whenPopUp([](int button) {
+                    .whenPressed([](int button) {
                         AppLogMessage("Config: Button clicked with button: {}"_fmt(button));
                     })
                     .build(provider.getRenderer(), provider.getWindow());
@@ -62,7 +62,7 @@ namespace application {
                     .withText("Exit")
                     .withRelativePosition(0.5, 0.6)
                     .withRelativeHeight(0.1)
-                    .whenPopUp([](int button) {
+                    .whenPressed([](int button) {
                         AppLogMessage("Exit: Button clicked with button: {}"_fmt(button));
                         application::isRunning = false;
                     })

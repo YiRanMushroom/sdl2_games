@@ -2,6 +2,8 @@ module;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL_image.h>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
@@ -11,7 +13,7 @@ module;
 #include <queue>
 
 #include <AppMacros.h>
-#include <SDL_image.h>
+
 
 export module SDL2_ImGui_VM;
 
@@ -37,6 +39,10 @@ struct SDL2_Context_Holder {
             if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
                 throw runtime_error(IMG_GetError());
             }
+
+            if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+                throw runtime_error(Mix_GetError());
+            }
         } catch (const runtime_error &e) {
             std::cerr << "Error: " << e.what() << std::endl;
             throw e;
@@ -47,6 +53,7 @@ struct SDL2_Context_Holder {
 
     ~SDL2_Context_Holder() {
         std::cout << "SDL2 Quitting" << std::endl;
+        Mix_CloseAudio();
         IMG_Quit();
         TTF_Quit();
         SDL_Quit();

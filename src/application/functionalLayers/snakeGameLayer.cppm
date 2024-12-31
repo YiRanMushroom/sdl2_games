@@ -1,6 +1,7 @@
 module;
 
 #include <SDL2/SDL.h>
+#include <SDL_mixer.h>
 #include <imgui.h>
 #include <utility>
 #include <list>
@@ -28,7 +29,7 @@ namespace application {
 
         inline static bool showSnakeGameLayerWindow = false;
 
-        size_t mapSize = application::snakeSizeMap;
+        size_t mapSize;
 
         enum class SnakePartState : uint8_t {
             NONE,
@@ -71,11 +72,11 @@ namespace application {
         Direction nextDirection;
 
         std::chrono::time_point<std::chrono::system_clock> lastMoveTime;
-        const std::chrono::system_clock::duration moveInterval = std::chrono::milliseconds(500);
+        std::chrono::system_clock::duration moveInterval;
         std::chrono::system_clock::duration durationSinceLastMove;
 
         std::chrono::time_point<std::chrono::system_clock> lastFoodTime;
-        const std::chrono::system_clock::duration foodInterval = std::chrono::seconds(3);
+        std::chrono::system_clock::duration foodGenerateInterval;
         std::chrono::system_clock::duration durationSinceLastFood;
 
         enum class GameState : uint8_t {
@@ -154,6 +155,10 @@ namespace application {
                 snakeParts.push_back(snakeMap[xs[1]][y].get());
                 snakeParts.push_back(snakeMap[xs[2]][y].get());
 
+                emptyPositions.erase(Position(xs[0], y));
+                emptyPositions.erase(Position(xs[1], y));
+                emptyPositions.erase(Position(xs[2], y));
+
                 currentDirection = Direction::RIGHT;
                 nextDirection = Direction::RIGHT;
             }
@@ -173,15 +178,19 @@ namespace application {
             imguiWindowHolder = addImGuiDisplayWindow(
                 "Snake Game Layer", &showSnakeGameLayerWindow,
                 [this](bool *) {
-                    static auto msg = "Snake Map Size: {}"_fmt(application::snakeSizeMap);
+                    static auto msg = "Snake Map Size: {}"_fmt(application::config::snakeGame::sizeMap);
                     ImGui::Text("%s", msg.c_str());
                     // for (auto &row: mapString) {
                     //     ImGui::Text("%s", row.c_str());
                     // }
                 });
 
+            mapSize = application::config::snakeGame::sizeMap;
+            moveInterval = std::chrono::milliseconds(application::config::snakeGame::moveInterval);
+            foodGenerateInterval = std::chrono::milliseconds(application::config::snakeGame::foodGenerateInterval);
+
             // initial length is 3;
-            assert(mapSize % 2 == 1);
+            // assert(mapSize % 2 == 1);
 
             backGroundSurface = decltype(backGroundSurface){
                 SDL_CreateRGBSurface(0, mapSize, mapSize, 32,
@@ -319,19 +328,28 @@ namespace application {
 
                 snakeMap[newHead.position.x][newHead.position.y] = make_unique<MapBlockInfo>(newHead);
                 snakeParts.push_front(snakeMap[newHead.position.x][newHead.position.y].get());
+                emptyPositions.erase(newHead.position);
+
+                if (emptyPositions.empty() && foodPositions.empty()) {
+                    gameState = GameState::Over;
+                }
             };
 
             if (block != nullptr) {
                 if (block->isFood) {
                     doChange();
                     foodPositions.erase(newHead.position);
+                    Mix_PlayChannel(-1, mixChunks["snake/eat"].get(), 0);
                     return false;
                 }
-                return true;
+
+                if (block->backState != SnakePartState::NONE) {
+                    return true;
+                }
             }
 
-            doChange();
             removeTail();
+            doChange();
             return false;
         }
 
@@ -421,8 +439,8 @@ namespace application {
             auto now = std::chrono::system_clock::now();
             durationSinceLastFood += now - lastFoodTime;
             lastFoodTime = now;
-            while (durationSinceLastFood >= foodInterval) {
-                durationSinceLastFood -= foodInterval;
+            while (durationSinceLastFood >= foodGenerateInterval) {
+                durationSinceLastFood -= foodGenerateInterval;
                 generateFood();
             }
         }
@@ -431,7 +449,8 @@ namespace application {
             if (x < 0 || x >= mapSize || y < 0 || y >= mapSize) {
                 return false;
             }
-            return snakeMap[x][y] == nullptr || snakeMap[x][y]->isFood;
+            return snakeMap[x][y] == nullptr || snakeMap[x][y]->isFood || snakeMap[x][y]->backState
+                   == SnakePartState::NONE;
         }
 
         void tryChangeTo(Direction newDirection) {
@@ -678,8 +697,10 @@ namespace application {
             size_t length = snakeParts.size();
             if (length == mapSize * mapSize) {
                 gameState = GameState::Success;
+                Mix_PlayChannel(-1, mixChunks["snake/success"].get(), 0);
             } else {
                 gameState = GameState::Score;
+                Mix_PlayChannel(-1, mixChunks["snake/game_over"].get(), 0);
             }
 
             auto &&fontHolder = *openSansHolder;

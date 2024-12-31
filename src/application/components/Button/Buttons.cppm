@@ -2,7 +2,7 @@ module;
 
 #include <SDL2/SDL.h>
 #include <utility>
-#include <AppMacros.h>
+#include <SDL2/SDL_mixer.h>
 #include <tuple>
 
 export module Buttons;
@@ -22,7 +22,7 @@ export enum class ButtonState {
 };
 
 namespace application {
-    export class SimpleConstantTextButton implements
+    export class SimpleConstantTextButton :
             public IRenderableComponent, public IWindowEventComponent,
             public IMouseMotionComponent, public IMouseButtonInteractableComponent {
         float xRatio;
@@ -30,7 +30,7 @@ namespace application {
         float heightRatio;
         float aspectRatio;
 
-        function<void(int)> onPopUp;
+        function<void(int)> onPressed;
 
         Texture fontTexture;
 
@@ -42,17 +42,15 @@ namespace application {
 
         ButtonState state = ButtonState::Default;
 
-        int button{};
-
     public:
         SimpleConstantTextButton(float xRatio, float yRatio, float heightRatio, float aspectRatio,
                                  SDL_Color backGroundColor,
-                                 Texture fontTexture, function<void(int)> onPopUp, SDL_Renderer *renderer,
+                                 Texture fontTexture, function<void(int)> onPressed, SDL_Renderer *renderer,
                                  SDL_Window *window)
             : xRatio(xRatio),
               yRatio(yRatio),
               heightRatio(heightRatio),
-              aspectRatio(aspectRatio), onPopUp(std::move(onPopUp)),
+              aspectRatio(aspectRatio), onPressed(std::move(onPressed)),
               fontTexture(std::move(fontTexture)),
               backgroundTextureDefault(
                   SDL2_Create_Solid_Color_Texture(backGroundColor, renderer)),
@@ -88,7 +86,8 @@ namespace application {
         virtual bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider &) override {
             if (SDL2_PointCollideWithRect(x, y, region)) {
                 state = ButtonState::Clicked;
-                this->button = button;
+                Mix_PlayChannel(-1, mixChunks["click"], 0);
+                onPressed(button);
                 return true;
             }
             return false;
@@ -96,9 +95,6 @@ namespace application {
 
         virtual bool onMouseButtonUp(int x, int y, int, IVirtualMachineContextProvider &) override {
             if (state == ButtonState::Clicked) {
-                if (SDL2_PointCollideWithRect(x, y, region)) {
-                    onPopUp(this->button);
-                }
                 state = SDL2_PointCollideWithRect(x, y, region) ? ButtonState::Hovered : ButtonState::Default;
             }
 
@@ -152,7 +148,7 @@ namespace application {
         float yRatio{};
         float heightRatio{};
 
-        function<void(int)> onPopUp;
+        function<void(int)> onPressed;
 
         string text;
         SDL_Color textColor{};
@@ -196,8 +192,8 @@ namespace application {
         //     return self;
         // }
 
-        decltype(auto) whenPopUp(this auto &&self, function<void(int)> onPopUp) {
-            self.onPopUp = std::move(onPopUp);
+        decltype(auto) whenPressed(this auto &&self, function<void(int)> onPressed) {
+            self.onPressed = std::move(onPressed);
             return self;
         }
 
@@ -209,7 +205,7 @@ namespace application {
             return {
                 xRatio, yRatio, heightRatio,
                 fontTexture.getAspectRatio(), backGroundColor,
-                std::move(fontTexture), onPopUp, renderer, window
+                std::move(fontTexture), onPressed, renderer, window
             };
         }
     };

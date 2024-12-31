@@ -3,6 +3,7 @@ module;
 #include <memory>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
 
 export module SDL2_Utilities;
 
@@ -305,3 +306,78 @@ export namespace application::colors {
         };
     }
 }
+
+
+struct mixChunkDeleter {
+    static void operator()(Mix_Chunk *chunk) {
+        Mix_FreeChunk(chunk);
+    }
+};
+
+struct mixMusicDeleter {
+    static void operator()(Mix_Music *music) {
+        Mix_FreeMusic(music);
+    }
+};
+
+export class MixChunk {
+    unique_ptr<Mix_Chunk, mixChunkDeleter> chunk;
+
+public:
+    MixChunk(Mix_Chunk *chunk) : chunk(chunk) {}
+
+    Mix_Chunk *get() const {
+        return chunk.get();
+    }
+
+    operator Mix_Chunk *() const {
+        return chunk.get();
+    }
+};
+
+export class SharedMixChunk {
+    shared_ptr<Mix_Chunk> chunk;
+
+public:
+    SharedMixChunk() = default;
+    SharedMixChunk(Mix_Chunk *chunk) : chunk{chunk, mixChunkDeleter{}} {}
+
+    Mix_Chunk *get() const {
+        return chunk.get();
+    }
+
+    operator Mix_Chunk *() const {
+        return chunk.get();
+    }
+};
+
+export class MixMusic {
+    unique_ptr<Mix_Music, mixMusicDeleter> music;
+
+public:
+    MixMusic(Mix_Music *music) : music(music) {}
+
+    Mix_Music *get() const {
+        return music.get();
+    }
+
+    operator Mix_Music *() const {
+        return music.get();
+    }
+};
+
+export class SharedMixMusic {
+    shared_ptr<Mix_Music> music;
+
+public:
+    SharedMixMusic() = default;
+    SharedMixMusic(Mix_Music *music) : music{music, mixMusicDeleter{}} {}
+
+    Mix_Music *get() const {
+        return music.get();
+    }
+
+    operator Mix_Music *() const {
+        return music.get();
+    }
+};

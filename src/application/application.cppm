@@ -25,7 +25,7 @@ import appMenuLayer;
 import applicationBasicLayers;
 
 int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
-    application::loadApplicationSettings();
+    application::config::loadApplicationSettings();
 
     auto vm = application::SDL2_ImGUi_VM_Factory{}
             .title("ImGui + SDL2 Test")
@@ -64,7 +64,7 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
 
     application::unloadApplicationResources();
 
-    application::saveApplicationSettings();
+    application::config::saveApplicationSettings();
 
     return 0;
 }

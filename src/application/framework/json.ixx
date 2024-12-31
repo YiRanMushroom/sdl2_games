@@ -40,6 +40,21 @@ namespace jsonutil {
         };
     }
 
+    export template<typename First, typename... Rest> requires (sizeof...(Rest) > 0)
+    decltype(auto) get_or_default(First&& first, Rest&&... rest)  {
+        return [first = std::forward_as_tuple(std::forward<First>(first)),
+                rest = std::forward_as_tuple(std::forward<Rest>(rest)...)](const json &j) {
+            try {
+                return j.at(std::get<0>(first)) | std::apply
+                ([]<typename... Tp>(Tp &&... unpacked) {
+                    return get_or_default(std::forward<Tp>(unpacked)...);
+                }, rest);
+            } catch (json::exception &) {
+                return std::get<sizeof...(Rest) - 1>(rest);
+            }
+        };
+    }
+
     // template<typename T>
     // using return_type_of = std::remove_cvref_t<decltype([] {
     //     using clean_type = std::remove_pointer_t<std::remove_all_extents_t<std::remove_cvref_t<T> > >;

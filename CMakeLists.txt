@@ -26,7 +26,8 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_executable(${PROJECT_NAME} WIN32
         ${SRC_FILES}
-#        src/application/config/snakeGameConfig.cppm
+        src/application/framework/freetype/freetypeFont.cppm
+        #        src/application/config/snakeGameConfig.cppm
 #        src/application/utilities/randomGenerator.cppm
 #        src/application/utilities/TextureAtlas.cppm
         #        src/application/framework/layer/workableLayer.cppm
@@ -97,3 +98,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_image::S
 
 find_package(SDL2_mixer CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>)
+
+# freetype
+find_package(Freetype REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Freetype::Freetype)
+

@@ -30,7 +30,7 @@ namespace application {
             auto selectGameButton = SimpleConstantTextButtonFactory{}
                     .withText("Select Game")
                     .withRelativePosition(0.5, 0.4)
-                    .withRelativeHeight(0.1)
+                    .withRelativeHeight(0.08)
                     .whenPressed([&provider, this](int button) {
                         AppLogMessage("Select Game: Button clicked with button: {}"_fmt(button));
 
@@ -51,7 +51,7 @@ namespace application {
             auto configButton = SimpleConstantTextButtonFactory{}
                     .withText("Config")
                     .withRelativePosition(0.5, 0.5)
-                    .withRelativeHeight(0.1)
+                    .withRelativeHeight(0.08)
                     .whenPressed([](int button) {
                         AppLogMessage("Config: Button clicked with button: {}"_fmt(button));
                     })
@@ -61,7 +61,7 @@ namespace application {
             auto exitButton = SimpleConstantTextButtonFactory{}
                     .withText("Exit")
                     .withRelativePosition(0.5, 0.6)
-                    .withRelativeHeight(0.1)
+                    .withRelativeHeight(0.08)
                     .whenPressed([](int button) {
                         AppLogMessage("Exit: Button clicked with button: {}"_fmt(button));
                         application::isRunning = false;

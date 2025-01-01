@@ -21,6 +21,7 @@ import SDL2_Utilities;
 import applicationConstants;
 import textureAtlas;
 import applicationResources;
+import freeTypeFont;
 
 namespace application {
     export class SnakeGameLayer : public application::WorkableLayer {
@@ -117,6 +118,8 @@ namespace application {
             foodPositions.clear();
             snakeMap.clear();
 
+            gameOverStringProvider = nullptr;
+
             snakeMap.resize(mapSize);
             for (auto &row: snakeMap) {
                 row.resize(mapSize);
@@ -155,6 +158,8 @@ namespace application {
                 snakeParts.push_back(snakeMap[xs[1]][y].get());
                 snakeParts.push_back(snakeMap[xs[2]][y].get());
 
+                updateSnakeLengthString(provider);
+
                 emptyPositions.erase(Position(xs[0], y));
                 emptyPositions.erase(Position(xs[1], y));
                 emptyPositions.erase(Position(xs[2], y));
@@ -171,6 +176,16 @@ namespace application {
             durationSinceLastMove = std::chrono::system_clock::duration::zero();
             lastFoodTime = std::chrono::system_clock::now();
             durationSinceLastFood = std::chrono::system_clock::duration::zero();
+        }
+
+        void updateSnakeLengthString(const IVirtualMachineContextProvider &provider) {
+            snakeLengthString = "Snake Length: {}"_fmt(snakeParts.size());
+            int windowWidth, windowHeight;
+            SDL_GetWindowSize(provider.getWindow(), &windowWidth, &windowHeight);
+            snakeLengthTask = freeTypeFontHolder->generateDetailedTask(
+                snakeLengthString, windowWidth / 4, windowHeight / 20);
+            snakeLengthTask.offsetX = (windowWidth - snakeLengthTask.w) * 5 / 6;
+            snakeLengthTask.offsetY = (windowHeight - snakeLengthTask.h) * 3 / 4;
         }
 
         SnakeGameLayer(function<void()> onDestruct, IVirtualMachineContextProvider &provider) : m_onDestruct( // NOLINT
@@ -221,17 +236,14 @@ namespace application {
             textureAtlas = SimpleSquareTextureAtlas<5, 75>("resources/images/snakeGameAtlas.png",
                                                            provider.getRenderer());
 
-            auto &&fontHolder = *openSansHolder;
-            fontHolder.loadFont(constants::default_font_size);
-
-            pauseTexture = fontHolder.getTextureBlended(constants::default_font_size, "Paused",
-                                                        constants::default_font_color,
-                                                        provider.getRenderer());
-
-            reminderTexture = fontHolder.getTextureBlended(constants::default_font_size,
-                                                           "Press ESC to exit, or press R to restart",
-                                                           constants::default_font_color,
-                                                           provider.getRenderer());
+            // pauseTexture = fontHolder.getTextureBlended(constants::default_font_size, "Paused",
+            //                                             constants::default_font_color,
+            //                                             provider.getRenderer());
+            //
+            // reminderTexture = fontHolder.getTextureBlended(constants::default_font_size,
+            //                                                "Press ESC to exitor press R to restart",
+            //                                                constants::default_font_color,
+            //                                                provider.getRenderer());
 
             initializeGame(provider);
         }
@@ -268,9 +280,13 @@ namespace application {
             static constexpr inline size_t food = 14;
         };
 
-        SDL_Rect reminderRect{};
-        SDL_Rect gameOverRect{};
-        SDL_Rect pauseRect{};
+        // std::pair<int, int> pauseOffset, reminderOffset, gameOverOffset;
+
+        FreeTypeFontHolder::DetailedTask pauseTask, reminderTask, gameOverTask, tipsTask, snakeLengthTask;
+
+        string snakeLengthString;
+
+        function<string_view()> gameOverStringProvider;
 
         void recalculateSize(const IVirtualMachineContextProvider &provider) {
             int windowWidth, windowHeight;
@@ -281,26 +297,68 @@ namespace application {
                                   mapSize * mapSizeScale);
             backGroundTexture = Texture::LoadFromSurface(provider.getRenderer(), backGroundSurface.get());
 
-            if (reminderTexture.get())
-                reminderRect = SDL2_RectBuilder{provider.getWindow()}
-                        .ofRelativePosition(0.5, 0.7)
-                        .withRelativeHeight(0.1, reminderTexture.getAspectRatio())
-                        .buildCentered();
+            // if (reminderTexture.get())
+            //     reminderRect = SDL2_RectBuilder{provider.getWindow()}
+            //             .ofRelativePosition(0.5, 0.7)
+            //             .withRelativeHeight(0.1, reminderTexture.getAspectRatio())
+            //             .buildCentered();
 
-            if (pauseTexture.get())
-                pauseRect = SDL2_RectBuilder{provider.getWindow()}
-                        .ofRelativePosition(0.5, 0.4)
-                        .withRelativeHeight(0.2, pauseTexture.getAspectRatio())
-                        .buildCentered();
 
-            if (gameOverTexture.get())
-                gameOverRect = SDL2_RectBuilder{provider.getWindow()}
-                        .ofRelativePosition(0.5, 0.4)
-                        .withRelativeHeight(0.2, gameOverTexture.getAspectRatio())
-                        .buildCentered();
+            // reminderOffset = {
+            //     (windowWidth - std::get<1>(remainderTaskInfos)) / 2,
+            //     (windowHeight - std::get<2>(remainderTaskInfos)) * 2 / 3
+            // };
+
+            reminderTask = freeTypeFontHolder->generateDetailedTask(
+                "Press ESC to exit\nOr press R to restart", windowWidth, windowHeight / 10);
+            reminderTask.offsetX = (windowWidth - reminderTask.w) / 2;
+            reminderTask.offsetY = (windowHeight - reminderTask.h) * 2 / 3;
+
+            // if (pauseTexture.get())
+            //     pauseRect = SDL2_RectBuilder{provider.getWindow()}
+            //             .ofRelativePosition(0.5, 0.4)
+            //             .withRelativeHeight(0.2, pauseTexture.getAspectRatio())
+            //             .buildCentered();
+            // auto pauseTaskInfos = freeTypeFontHolder->
+            //         generateDetailedTask("Paused", windowWidth, windowHeight / 3);
+            // pauseTask = std::move(std::get<0>(pauseTaskInfos));
+            // pauseOffset = {
+            //     (windowWidth - std::get<1>(pauseTaskInfos)) / 2,
+            //     (windowHeight - std::get<2>(pauseTaskInfos)) / 2
+            // };
+
+            pauseTask = freeTypeFontHolder->generateDetailedTask("Paused", windowWidth, windowHeight / 3);
+            pauseTask.offsetX = (windowWidth - pauseTask.w) / 2;
+            pauseTask.offsetY = (windowHeight - pauseTask.h) / 2;
+
+            // if (gameOverTexture.get())
+            //     gameOverRect = SDL2_RectBuilder{provider.getWindow()}
+            //             .ofRelativePosition(0.5, 0.4)
+            //             .withRelativeHeight(0.2, gameOverTexture.getAspectRatio())
+            //             .buildCentered();
+            if (gameOverStringProvider) {
+                // auto gameOverTaskInfos = freeTypeFontHolder->generateDetailedTask(
+                //     gameOverStringProvider(), windowWidth, windowHeight / 5);
+                // gameOverTask = std::move(std::get<0>(gameOverTaskInfos));
+                // gameOverOffset = {
+                //     (windowWidth - std::get<1>(gameOverTaskInfos)) / 2,
+                //     (windowHeight - std::get<2>(gameOverTaskInfos)) / 3
+                // };
+
+                gameOverTask = freeTypeFontHolder->generateDetailedTask(
+                    gameOverStringProvider(), windowWidth, windowHeight / 5);
+                gameOverTask.offsetX = (windowWidth - gameOverTask.w) / 2;
+                gameOverTask.offsetY = (windowHeight - gameOverTask.h) / 3;
+            }
+
+            tipsTask = freeTypeFontHolder->generateDetailedTask(
+                "Press SPACE to pause\nPress ESC to exit\nPress R to restart\nPress arrow keys to\nchange direction",
+                windowWidth / 4, windowHeight / 25);
+            tipsTask.offsetX = (windowWidth - tipsTask.w) * 5 / 6;
+            tipsTask.offsetY = (windowHeight - tipsTask.h) / 3;
         }
 
-        bool checkCollisionAndUpdateHead(MapBlockInfo newHead) {
+        bool checkCollisionAndUpdateHead(MapBlockInfo newHead, const IVirtualMachineContextProvider &provider) {
             auto original = snakeParts.front();
             if (newHead.position.x < 0 || newHead.position.x >= mapSize || // NOLINT
                 newHead.position.y < 0 || newHead.position.y >= mapSize) { // NOLINT
@@ -339,6 +397,7 @@ namespace application {
                 if (block->isFood) {
                     doChange();
                     foodPositions.erase(newHead.position);
+                    updateSnakeLengthString(provider);
                     Mix_PlayChannel(-1, mixChunks["snake/eat"].get(), 0);
                     return false;
                 }
@@ -362,7 +421,7 @@ namespace application {
             snakeParts.back()->backState = SnakePartState::NONE;
         }
 
-        bool advanceSnake() { // if true, game is over
+        bool advanceSnake(const IVirtualMachineContextProvider &provider) { // if true, game is over
             auto &head = snakeParts.front();
             Position newPosition = head->position;
             SnakePartState newBackState{};
@@ -391,11 +450,11 @@ namespace application {
 
             // bool isNewPositionFood = askPositionIsFood(newPosition);
 
-            return checkCollisionAndUpdateHead(newHead);
+            return checkCollisionAndUpdateHead(newHead, provider);
         }
 
-        void updateSnake() {
-            if (advanceSnake()) {
+        void updateSnake(const IVirtualMachineContextProvider &provider) {
+            if (advanceSnake(provider)) {
                 gameState = GameState::Over;
             }
         }
@@ -425,13 +484,13 @@ namespace application {
                     );
         }
 
-        void updateSnakeIfTime() {
+        void updateSnakeIfTime(const IVirtualMachineContextProvider &provider) {
             auto now = std::chrono::system_clock::now();
             durationSinceLastMove += now - lastMoveTime;
             lastMoveTime = now;
             while (durationSinceLastMove >= moveInterval) {
                 durationSinceLastMove -= moveInterval;
-                updateSnake();
+                updateSnake(provider);
             }
         }
 
@@ -534,17 +593,33 @@ namespace application {
 
         void postEventListening(IVirtualMachineContextProvider &provider) override {
             if (gameState == GameState::Running) {
-                updateSnakeIfTime();
+                updateSnakeIfTime(provider);
                 generateFoodIfTime();
             }
 
             if (gameState == GameState::Over) {
                 calculateGameScore(provider);
-                if (gameOverTexture.get())
-                    gameOverRect = SDL2_RectBuilder{provider.getWindow()}
-                            .ofRelativePosition(0.5, 0.4)
-                            .withRelativeHeight(0.2, gameOverTexture.getAspectRatio())
-                            .buildCentered();
+
+                int windowWidth, windowHeight;
+                SDL_GetWindowSize(provider.getWindow(), &windowWidth, &windowHeight);
+
+                // auto gameOverTaskInfos = freeTypeFontHolder->generateDetailedTask(
+                //     gameOverStringProvider(), windowWidth, windowHeight / 5);
+                //
+                // gameOverTask = std::move(std::get<0>(gameOverTaskInfos));
+                // gameOverOffset = {
+                //     (windowWidth - std::get<1>(gameOverTaskInfos)) / 2,
+                //     (windowHeight - std::get<2>(gameOverTaskInfos)) * 2 / 5
+                // };
+                // if (gameOverTexture.get())
+                //     gameOverRect = SDL2_RectBuilder{provider.getWindow()}
+                //             .ofRelativePosition(0.5, 0.4)
+                //             .withRelativeHeight(0.2, gameOverTexture.getAspectRatio())
+                //             .buildCentered();
+                gameOverTask = freeTypeFontHolder->generateDetailedTask(
+                    gameOverStringProvider(), windowWidth, windowHeight / 5);
+                gameOverTask.offsetX = (windowWidth - gameOverTask.w) / 2;
+                gameOverTask.offsetY = (windowHeight - gameOverTask.h) * 2 / 5;
             }
         }
 
@@ -689,9 +764,9 @@ namespace application {
             }
         }
 
-        Texture reminderTexture;
-        Texture gameOverTexture;
-        Texture pauseTexture;
+        // Texture reminderTexture;
+        // Texture gameOverTexture;
+        // Texture pauseTexture;
 
         void calculateGameScore(const IVirtualMachineContextProvider &provider) {
             size_t length = snakeParts.size();
@@ -705,30 +780,70 @@ namespace application {
 
             auto &&fontHolder = *openSansHolder;
 
-            gameOverTexture = fontHolder.getTextureBlended(constants::default_font_size,
-                                                           gameState == GameState::Success
-                                                               ? "You Win!"
-                                                               : "Your Score: {}"_fmt(length),
-                                                           constants::default_font_color,
-                                                           provider.getRenderer());
+            gameOverStringProvider = [string = gameState == GameState::Success
+                                                   ? string{"You Win!"}
+                                                   : "Your Score: {}"_fmt(length) ]() -> string_view {
+                return string.c_str();
+            };
+
+            // gameOverTexture = fontHolder.getTextureBlended(constants::default_font_size,
+            //                                                gameState == GameState::Success
+            //                                                    ? "You Win!"
+            //                                                    : "Your Score: {}"_fmt(length),
+            //                                                constants::default_font_color,
+            //                                                provider.getRenderer());
+        }
+
+        void renderTips(const IVirtualMachineContextProvider &provider) const {
+            auto pushColor = application::colors::PushColor{
+                tipsTask.fontAtlasTexture, SDL_Color{255, 255, 255, 255}
+            };
+            FreeTypeFontHolder::renderCenteredDetailedTask(tipsTask, provider.getRenderer());
+        }
+
+        void renderSnakeLength(const IVirtualMachineContextProvider &provider) const {
+            auto pushColor = application::colors::PushColor{
+                snakeLengthTask.fontAtlasTexture, SDL_Color{0, 255, 0, 255}
+            };
+            FreeTypeFontHolder::renderCenteredDetailedTask(snakeLengthTask, provider.getRenderer());
         }
 
         void render(IVirtualMachineContextProvider &provider) override {
             SDL2_RenderTextureRect(provider.getRenderer(), backGroundTexture, renderRect);
             renderFood(provider);
             renderSnake(provider);
+            renderTips(provider);
 
+            if (gameState == GameState::Running || gameState == GameState::Paused) {
+                renderSnakeLength(provider);
+            }
 
             switch (gameState) {
-                case GameState::Paused:
-                    SDL2_RenderTextureRect(provider.getRenderer(), pauseTexture, pauseRect);
+                case GameState::Paused: {
+                    auto pushColor = application::colors::PushColor{
+                        pauseTask.fontAtlasTexture, SDL_Color{255, 255, 255, 127}
+                    };
+                    FreeTypeFontHolder::renderCenteredDetailedTask(pauseTask, provider.getRenderer());
                     break;
+                }
                 case GameState::Over:
+                    throw std::runtime_error("Impossible to reach here");
                 case GameState::Success:
-                case GameState::Score:
-                    SDL2_RenderTextureRect(provider.getRenderer(), gameOverTexture, gameOverRect);
-                    SDL2_RenderTextureRect(provider.getRenderer(), reminderTexture, reminderRect);
+                case GameState::Score: {
+                    {
+                        auto pushColor = application::colors::PushColor{
+                            gameOverTask.fontAtlasTexture, SDL_Color{255, 0, 255, 255}
+                        };
+                        FreeTypeFontHolder::renderCenteredDetailedTask(gameOverTask, provider.getRenderer());
+                    } {
+                        auto pushColor = application::colors::PushColor{
+                            pauseTask.fontAtlasTexture, SDL_Color{255, 255, 255, 255}
+                        };
+
+                        FreeTypeFontHolder::renderCenteredDetailedTask(reminderTask, provider.getRenderer());
+                    }
                     break;
+                }
                 default: break;
             }
         }

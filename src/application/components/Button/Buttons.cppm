@@ -14,6 +14,7 @@ import SDL2_Utilities;
 import IComponent;
 import applicationConstants;
 import applicationResources;
+import freeTypeFont;
 
 export enum class ButtonState {
     Default,
@@ -28,11 +29,10 @@ namespace application {
         float xRatio;
         float yRatio;
         float heightRatio;
-        float aspectRatio;
 
         function<void(int)> onPressed;
 
-        Texture fontTexture;
+        function<string_view()> textProvider;
 
         Texture backgroundTextureDefault;
         Texture backgroundTextureHovered;
@@ -40,18 +40,23 @@ namespace application {
 
         SDL_Rect region;
 
+        FreeTypeFontHolder::DetailedTask fontRendererTasks;
+
+        int startX, startY, maxWidth, height;
+
         ButtonState state = ButtonState::Default;
 
     public:
-        SimpleConstantTextButton(float xRatio, float yRatio, float heightRatio, float aspectRatio,
+        SimpleConstantTextButton(float xRatio, float yRatio, float heightRatio,
                                  SDL_Color backGroundColor,
-                                 Texture fontTexture, function<void(int)> onPressed, SDL_Renderer *renderer,
+                                 function<string_view()> textProvider, function<void(int)> onPressed,
+                                 SDL_Renderer *renderer,
                                  SDL_Window *window)
             : xRatio(xRatio),
               yRatio(yRatio),
               heightRatio(heightRatio),
-              aspectRatio(aspectRatio), onPressed(std::move(onPressed)),
-              fontTexture(std::move(fontTexture)),
+              onPressed(std::move(onPressed)),
+              textProvider(std::move(textProvider)),
               backgroundTextureDefault(
                   SDL2_Create_Solid_Color_Texture(backGroundColor, renderer)),
               backgroundTextureHovered(
@@ -62,12 +67,9 @@ namespace application {
                   SDL2_Create_Solid_Color_Texture(
                       application::colors::Darker(
                           backGroundColor),
-                      renderer)), region(
-                  SDL2_RectBuilder(window)
-                  .ofRelativePosition(xRatio, yRatio)
-                  .withRelativeHeight(heightRatio, aspectRatio)
-                  .buildCentered()
-              ) {}
+                      renderer)) {
+            calculateRegion(window);
+        }
 
         virtual bool onMouseMotion(int x, int y, IVirtualMachineContextProvider &) override {
             if (state == ButtonState::Clicked) {
@@ -95,7 +97,9 @@ namespace application {
 
         virtual bool onMouseButtonUp(int x, int y, int, IVirtualMachineContextProvider &) override {
             if (state == ButtonState::Clicked) {
-                state = SDL2_PointCollideWithRect(x, y, region) ? ButtonState::Hovered : ButtonState::Default;
+                state = SDL2_PointCollideWithRect(x, y, region)
+                            ? ButtonState::Hovered
+                            : ButtonState::Default;
             }
 
             return false;
@@ -115,16 +119,38 @@ namespace application {
                 }
             }(), region);
 
-            SDL2_RenderTextureRect(provider.getRenderer(), fontTexture, region);
+            auto pushColor = application::colors::PushColor{
+                fontRendererTasks.fontAtlasTexture, constants::default_font_color
+            };
+
+            FreeTypeFontHolder::renderCenteredDetailedTask(fontRendererTasks, provider.getRenderer());
         }
 
-        virtual bool onWindowSizeChanged(int, int,
-                                         IVirtualMachineContextProvider &provider) override {
-            region = SDL2_RectBuilder(provider.getWindow())
-                    .ofRelativePosition(xRatio, yRatio)
-                    .withRelativeHeight(heightRatio, aspectRatio)
-                    .buildCentered();
+        bool onWindowSizeChanged(int, int,
+                                 IVirtualMachineContextProvider &provider) override {
+            calculateRegion(provider.getWindow());
             return false;
+        }
+
+        void calculateRegion(SDL_Window *window) {
+            int windowWidth, windowHeight;
+            SDL_GetWindowSize(window, &windowWidth, &windowHeight);
+
+            height = static_cast<int>(static_cast<float>(windowHeight) * heightRatio);
+            maxWidth = windowWidth;
+
+            fontRendererTasks = freeTypeFontHolder->generateDetailedTask(
+                textProvider(), windowWidth, height);
+
+            int width = fontRendererTasks.w;
+            int height = fontRendererTasks.h;
+            region = SDL_Rect(
+                windowWidth * xRatio - width / 2,
+                windowHeight * yRatio - height / 2,
+                width, height
+            );
+            fontRendererTasks.offsetX = region.x;
+            fontRendererTasks.offsetY = region.y;
         }
 
         std::tuple<
@@ -179,8 +205,6 @@ namespace application {
 
         decltype(auto) ofBackGroundColor(this auto &&self, SDL_Color backGroundColor) {
             self.backGroundColor = backGroundColor;
-            self.backGroundHoveredColor = application::colors::Brighter(backGroundColor);
-            self.backGroundClickedColor = application::colors::Darker(backGroundColor);
             return self;
         }
 
@@ -200,12 +224,17 @@ namespace application {
         SimpleConstantTextButton build(SDL_Renderer *renderer, SDL_Window *window) {
             auto &&fontHolder = *openSansHolder;
             fontHolder.loadFont(constants::default_font_size);
-            auto fontTexture = fontHolder.getTextureBlended(constants::default_font_size, text, textColor, renderer);
+            function<string_view()> textProvider = [text = std::move(text)] -> string_view { return text.c_str(); };
 
             return {
-                xRatio, yRatio, heightRatio,
-                fontTexture.getAspectRatio(), backGroundColor,
-                std::move(fontTexture), onPressed, renderer, window
+                xRatio,
+                yRatio,
+                heightRatio,
+                backGroundColor,
+                std::move(textProvider),
+                onPressed,
+                renderer,
+                window
             };
         }
     };

@@ -340,6 +340,7 @@ export class SharedMixChunk {
 
 public:
     SharedMixChunk() = default;
+
     SharedMixChunk(Mix_Chunk *chunk) : chunk{chunk, mixChunkDeleter{}} {}
 
     Mix_Chunk *get() const {
@@ -371,6 +372,7 @@ export class SharedMixMusic {
 
 public:
     SharedMixMusic() = default;
+
     SharedMixMusic(Mix_Music *music) : music{music, mixMusicDeleter{}} {}
 
     Mix_Music *get() const {
@@ -381,3 +383,19 @@ public:
         return music.get();
     }
 };
+
+namespace application::colors {
+    export struct PushColor {
+        SDL_Texture *texture;
+
+        PushColor(SDL_Texture *texture, SDL_Color color) : texture(texture) {
+            SDL_SetTextureColorMod(texture, color.r, color.g, color.b);
+            SDL_SetTextureAlphaMod(texture, color.a);
+        }
+
+        ~PushColor() {
+            SDL_SetTextureColorMod(texture, 255, 255, 255);
+            SDL_SetTextureAlphaMod(texture, 255);
+        }
+    };
+}

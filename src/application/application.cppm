@@ -23,6 +23,7 @@ import imguiUtilities;
 import applicationResources;
 import appMenuLayer;
 import applicationBasicLayers;
+import freeTypeFont;
 
 int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     application::config::loadApplicationSettings();
@@ -36,7 +37,9 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
             .rendererFlags(SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)
             .build();
 
-    application::loadApplicationResources();
+    application::loadApplicationResources(vm);
+
+    auto fontAtlas = FreeTypeFontHolder{"resources/fonts/Open_Sans/static/OpenSans-Regular.ttf", vm.getRenderer()};
 
     auto &&layers = vm.layers;
 
@@ -54,6 +57,8 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
         vm.postEventListening();
 
         vm.render();
+
+        // fontAtlas.renderCenteredMultiLine(vm.getRenderer(), "Hello, World!aldfjasdldjfgfsdfgasgl\nasjdfl", 100, 100, 500, 48);
 
         SDL_RenderPresent(vm.getRenderer());
 

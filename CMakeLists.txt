@@ -26,7 +26,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 
 add_executable(${PROJECT_NAME} WIN32
         ${SRC_FILES}
-        src/application/framework/freetype/freetypeFont.cppm
+#        src/application/framework/freetype/freetypeFont.cppm
         #        src/application/config/snakeGameConfig.cppm
 #        src/application/utilities/randomGenerator.cppm
 #        src/application/utilities/TextureAtlas.cppm

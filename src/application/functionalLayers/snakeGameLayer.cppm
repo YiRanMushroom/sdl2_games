@@ -8,6 +8,7 @@ module;
 #include <vector>
 #include <chrono>
 #include <cassert>
+#include <iostream>
 
 export module snakeGameLayer;
 
@@ -361,7 +362,8 @@ namespace application {
         bool checkCollisionAndUpdateHead(MapBlockInfo newHead, const IVirtualMachineContextProvider &provider) {
             auto original = snakeParts.front();
             if (newHead.position.x < 0 || newHead.position.x >= mapSize || // NOLINT
-                newHead.position.y < 0 || newHead.position.y >= mapSize) { // NOLINT
+                newHead.position.y < 0 || newHead.position.y >= mapSize) {
+                // NOLINT
                 return true;
             }
 
@@ -421,7 +423,8 @@ namespace application {
             snakeParts.back()->backState = SnakePartState::NONE;
         }
 
-        bool advanceSnake(const IVirtualMachineContextProvider &provider) { // if true, game is over
+        bool advanceSnake(const IVirtualMachineContextProvider &provider) {
+            // if true, game is over
             auto &head = snakeParts.front();
             Position newPosition = head->position;
             SnakePartState newBackState{};

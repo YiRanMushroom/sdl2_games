@@ -22,10 +22,10 @@ namespace application {
     public:
         static inline SDL_Color backGroundColor = application::constants::default_background_color;
 
-        bool handle(const SDL_Event &event, bool prevHandled, IVirtualMachineContextProvider &) override {
+        bool handle(const SDL_Event &event, bool prevHandled, IVirtualMachineContextProvider &provider) override {
             if (event.type == SDL_QUIT) {
                 application::isRunning = false;
-                return true;
+                return prevHandled;
             }
             return prevHandled;
         }

@@ -7,7 +7,7 @@ export module IComponent;
 import workableLayer;
 
 namespace application {
-    export interface IWindowEventComponent {
+    /*export interface IWindowEventComponent {
         virtual ~IWindowEventComponent() = default;
 
         virtual bool onWindowSizeChanged(int, int, IVirtualMachineContextProvider &) {
@@ -73,5 +73,5 @@ namespace application {
         virtual bool onMouseWheel(int, int, unsigned int, IVirtualMachineContextProvider &) {
             return false;
         }
-    };
+    };*/
 }

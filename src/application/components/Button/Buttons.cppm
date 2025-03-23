@@ -1,19 +1,17 @@
 module;
 
 #include <SDL2/SDL.h>
-#include <utility>
 #include <SDL_mixer.h>
-#include <tuple>
 
 export module Buttons;
 
 import ywl.prelude;
 import workableLayer;
 import SDL2_Utilities;
-import IComponent;
 import applicationConstants;
 import applicationResources;
 import freeTypeFont;
+import Components;
 
 using std::function;
 using std::string_view;
@@ -30,8 +28,12 @@ export enum class ButtonState {
 
 namespace application {
     export class SimpleConstantTextButton :
-            public IRenderableComponent, public IWindowEventComponent,
-            public IMouseMotionComponent, public IMouseButtonInteractableComponent {
+            public components::DerivedComponentFrom<
+                    components::IRenderableComponent,
+                    components::IMouseButtonUpComponent,
+                    components::IMouseButtonDownComponent,
+                    components::IWindowEventComponent
+            > {
         float xRatio;
         float yRatio;
         float heightRatio;
@@ -58,42 +60,27 @@ namespace application {
                                  function<string_view()> textProvider, function<void(int)> onPressed,
                                  SDL_Renderer *renderer,
                                  SDL_Window *window)
-            : xRatio(xRatio),
-              yRatio(yRatio),
-              heightRatio(heightRatio),
-              onPressed(std::move(onPressed)),
-              textProvider(std::move(textProvider)),
-              backgroundTextureDefault(
-                  SDL2_Create_Solid_Color_Texture(backGroundColor, renderer)),
-              backgroundTextureHovered(
-                  SDL2_Create_Solid_Color_Texture(
-                      application::colors::Brighter(
-                          backGroundColor), renderer)),
-              backgroundTextureClicked(
-                  SDL2_Create_Solid_Color_Texture(
-                      application::colors::Darker(
-                          backGroundColor),
-                      renderer)) {
+                : xRatio(xRatio),
+                  yRatio(yRatio),
+                  heightRatio(heightRatio),
+                  onPressed(std::move(onPressed)),
+                  textProvider(std::move(textProvider)),
+                  backgroundTextureDefault(
+                          SDL2_Create_Solid_Color_Texture(backGroundColor, renderer)),
+                  backgroundTextureHovered(
+                          SDL2_Create_Solid_Color_Texture(
+                                  application::colors::Brighter(
+                                          backGroundColor), renderer)),
+                  backgroundTextureClicked(
+                          SDL2_Create_Solid_Color_Texture(
+                                  application::colors::Darker(
+                                          backGroundColor),
+                                  renderer)) {
             calculateRegion(window);
         }
 
-        virtual bool onMouseMotion(int x, int y, IVirtualMachineContextProvider &) override {
-            if (state == ButtonState::Clicked) {
-                return false;
-            }
-
+        bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider *) override {
             if (SDL2_PointCollideWithRect(x, y, region)) {
-                state = ButtonState::Hovered;
-            } else {
-                state = ButtonState::Default;
-            }
-
-            return false;
-        }
-
-        virtual bool onMouseButtonDown(int x, int y, int button, IVirtualMachineContextProvider &) override {
-            if (SDL2_PointCollideWithRect(x, y, region)) {
-                state = ButtonState::Clicked;
                 Mix_PlayChannel(-1, mixChunks["click"], 0);
                 onPressed(button);
                 return true;
@@ -101,18 +88,30 @@ namespace application {
             return false;
         }
 
-        virtual bool onMouseButtonUp(int x, int y, int, IVirtualMachineContextProvider &) override {
+        bool onMouseButtonUp(int x, int y, int, IVirtualMachineContextProvider *) override {
             if (state == ButtonState::Clicked) {
                 state = SDL2_PointCollideWithRect(x, y, region)
-                            ? ButtonState::Hovered
-                            : ButtonState::Default;
+                        ? ButtonState::Hovered
+                        : ButtonState::Default;
             }
 
             return false;
         }
 
-        virtual void onRender(IVirtualMachineContextProvider &provider) override {
-            SDL2_RenderTextureRect(provider.getRenderer(), [&]-> const Texture &{
+        void onRender(IVirtualMachineContextProvider *provider) override {
+            int x, y;
+            bool leftButtonPressed = SDL_GetMouseState(&x, &y) & SDL_BUTTON(SDL_BUTTON_LEFT);
+            if (SDL2_PointCollideWithRect(x, y, region)) {
+                if (leftButtonPressed) {
+                    state = ButtonState::Clicked;
+                } else {
+                    state = ButtonState::Hovered;
+                }
+            } else {
+                state = ButtonState::Default;
+            }
+
+            SDL2_RenderTextureRect(provider->getRenderer(), [&] -> const Texture & {
                 switch (state) {
                     case ButtonState::Default:
                         return backgroundTextureDefault;
@@ -126,15 +125,15 @@ namespace application {
             }(), region);
 
             auto pushColor = application::colors::PushColor{
-                fontRendererTasks.fontAtlasTexture, constants::default_font_color
+                    fontRendererTasks.fontAtlasTexture, constants::default_font_color
             };
 
-            FreeTypeFontHolder::renderCenteredDetailedTask(fontRendererTasks, provider.getRenderer());
+            FreeTypeFontHolder::renderCenteredDetailedTask(fontRendererTasks, provider->getRenderer());
         }
 
         bool onWindowSizeChanged(int, int,
-                                 IVirtualMachineContextProvider &provider) override {
-            calculateRegion(provider.getWindow());
+                                 IVirtualMachineContextProvider *provider) override {
+            calculateRegion(provider->getWindow());
             return false;
         }
 
@@ -146,32 +145,17 @@ namespace application {
             maxWidth = windowWidth;
 
             fontRendererTasks = freeTypeFontHolder->generateDetailedTask(
-                textProvider(), windowWidth, height);
+                    textProvider(), windowWidth, height);
 
             int width = fontRendererTasks.w;
             int height = fontRendererTasks.h;
             region = SDL_Rect(
-                windowWidth * xRatio - width / 2,
-                windowHeight * yRatio - height / 2,
-                width, height
+                    windowWidth * xRatio - width / 2,
+                    windowHeight * yRatio - height / 2,
+                    width, height
             );
             fontRendererTasks.offsetX = region.x;
             fontRendererTasks.offsetY = region.y;
-        }
-
-        std::tuple<
-            shared_ptr<IRenderableComponent>,
-            shared_ptr<IMouseMotionComponent>,
-            shared_ptr<IMouseButtonInteractableComponent>,
-            shared_ptr<IWindowEventComponent>
-        > breakDown(this SimpleConstantTextButton &&self) { //NOLINT
-            shared_ptr<SimpleConstantTextButton> selfPtr = make_shared<SimpleConstantTextButton>(std::move(self));
-            return {
-                selfPtr,
-                selfPtr,
-                selfPtr,
-                selfPtr
-            };
         }
     };
 
@@ -186,8 +170,6 @@ namespace application {
         SDL_Color textColor{};
 
         SDL_Color backGroundColor = constants::default_button_color;
-        // SDL_Color backGroundHoveredColor = application::__impl::Get_Default_Hovered_Color(backGroundColor);
-        // SDL_Color backGroundClickedColor = application::__impl::Get_Default_Clicked_Color(backGroundColor);
 
     public:
         SimpleConstantTextButtonFactory() = default;
@@ -214,14 +196,6 @@ namespace application {
             return self;
         }
 
-        // decltype(auto) ofBackGroundColors(this auto &&self, SDL_Color backGroundColor, SDL_Color backGroundHoveredColor,
-        //                                   SDL_Color backGroundClickedColor) {
-        //     self.backGroundColor = backGroundColor;
-        //     self.backGroundHoveredColor = backGroundHoveredColor;
-        //     self.backGroundClickedColor = backGroundClickedColor;
-        //     return self;
-        // }
-
         decltype(auto) whenPressed(this auto &&self, function<void(int)> onPressed) {
             self.onPressed = std::move(onPressed);
             return self;
@@ -230,17 +204,20 @@ namespace application {
         SimpleConstantTextButton build(SDL_Renderer *renderer, SDL_Window *window) {
             auto &&fontHolder = *openSansHolder;
             fontHolder.loadFont(constants::default_font_size);
-            function<string_view()> textProvider = [text = std::move(text)] -> string_view { return text.c_str(); };
+            function < string_view() > textProvider =
+                    [text = std::move(text)]() -> string_view {
+                        return text;
+                    };
 
             return {
-                xRatio,
-                yRatio,
-                heightRatio,
-                backGroundColor,
-                std::move(textProvider),
-                onPressed,
-                renderer,
-                window
+                    xRatio,
+                    yRatio,
+                    heightRatio,
+                    backGroundColor,
+                    std::move(textProvider),
+                    onPressed,
+                    renderer,
+                    window
             };
         }
     };

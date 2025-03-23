@@ -20,7 +20,7 @@ using std::vector;
 using std::shared_ptr;
 
 namespace application {
-    export interface IMouseMotionAutoHandler {
+    /*export interface IMouseMotionAutoHandler {
         virtual ~IMouseMotionAutoHandler() = default;
 
         vector<shared_ptr<IMouseMotionComponent> > mouseMoveInteractableComponents;
@@ -164,5 +164,5 @@ namespace application {
             addRenderableComponent(components);
             addWindowSizeChangedComponent(components);
         }
-    };
+    };*/
 }

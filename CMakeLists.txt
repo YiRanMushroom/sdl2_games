@@ -9,7 +9,7 @@ file(GLOB_RECURSE SRC_FILES src/*.cppm src/*.ixx src/*.cpp)
 file(GLOB_RECURSE MODULE_FILES src/*.cppm src/*.ixx)
 
 add_executable(${PROJECT_NAME} WIN32 ${SRC_FILES} ${MODULE_FILES}
-        src/application/components/IComponentBase.cppm)
+        src/application/components/Components.cppm)
 target_include_directories(${PROJECT_NAME} PRIVATE src/headers)
 target_sources(${PROJECT_NAME} PUBLIC FILE_SET cxx_modules TYPE CXX_MODULES FILES ${MODULE_FILES})
 

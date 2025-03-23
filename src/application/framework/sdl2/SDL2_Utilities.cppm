@@ -1,8 +1,6 @@
 module;
 
-#include <memory>
 #include <SDL2/SDL.h>
-#include <SDL_ttf.h>
 #include <SDL_mixer.h>
 
 export module SDL2_Utilities;

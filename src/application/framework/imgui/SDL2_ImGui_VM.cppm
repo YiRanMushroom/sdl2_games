@@ -8,16 +8,10 @@ module;
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
 
-#include <iostream>
-#include <list>
-#include <queue>
-
 #include <AppMacros.h>
-
 
 export module SDL2_ImGui_VM;
 
-import SDL2_EventListener;
 import ywl.prelude;
 import workableLayer;
 import applicationSharedState;

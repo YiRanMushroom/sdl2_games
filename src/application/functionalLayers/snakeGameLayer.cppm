@@ -3,17 +3,10 @@ module;
 #include <SDL2/SDL.h>
 #include <SDL_mixer.h>
 #include <imgui.h>
-#include <utility>
-#include <list>
-#include <vector>
-#include <chrono>
-#include <cassert>
-#include <iostream>
 
 export module snakeGameLayer;
 
 import ywl.prelude;
-import layerFramework;
 import snakeGameConfig;
 import imguiWindows;
 import randomGenerator;
@@ -22,6 +15,7 @@ import applicationConstants;
 import textureAtlas;
 import applicationResources;
 import freeTypeFont;
+import workableLayer;
 
 using std::unique_ptr;
 using std::function;

@@ -4,11 +4,9 @@ module;
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <SDL2/SDL.h>
-// #include <utility>
-#include <cmath>
-#include <algorithm>
 
 export module freeTypeFont;
+
 import ywl.prelude;
 import SDL2_Utilities;
 import imguiUtilities;
@@ -21,21 +19,8 @@ using std::vector;
 using std::runtime_error;
 
 export class FreeTypeFontHolder {
-public:
-    // using LibraryPointerType = FT_Library;
-    // using LibraryActualType = std::remove_cvref_t<decltype(*std::declval<FT_Library>())>;
 
 private:
-    // struct LibraryDeleter {
-    //     static void operator()(LibraryActualType *library) {
-    //         if (library)
-    //             FT_Done_FreeType(library);
-    //     }
-    // };
-    //
-    // unique_ptr<LibraryActualType, LibraryDeleter> library;
-    // string fontLocation;
-
     struct CharInfo {
         SDL_Rect posAtlas{};
         int advance{};

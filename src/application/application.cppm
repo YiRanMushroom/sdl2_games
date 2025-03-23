@@ -2,21 +2,16 @@ module;
 
 #include <SDL2/SDL.h>
 #include <imgui.h>
-#include <fstream>
-#include <type_traits>
 
 export module application;
 
 import ywl.prelude;
-import SDL2_EventListener;
 import SDL2_ImGui_VM;
-import appEventListener;
 import applicationSharedState;
 import fileUtilities;
 import applicationConfig;
 import fontHolder;
 import SDL2_Utilities;
-import IComponent;
 import Buttons;
 import imguiUtilities;
 import applicationResources;

@@ -2,7 +2,6 @@ module;
 
 #include <AppMacros.h>
 #include <SDL2/SDL.h>
-#include <SDL_ttf.h>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
 #include <imgui_impl_sdlrenderer2.h>
@@ -10,12 +9,12 @@ module;
 export module applicationBasicLayers;
 
 import applicationResources;
-import layerFramework;
 import applicationSharedState;
 import imguiUtilities;
 import ywl.prelude;
 import applicationConstants;
 import imguiWindows;
+import workableLayer;
 
 namespace application {
     export class BasicFrameworkLayer extends public WorkableLayer {

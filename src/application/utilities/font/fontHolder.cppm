@@ -1,7 +1,6 @@
 module;
 
 #include <SDL_ttf.h>
-#include <utility>
 
 export module fontHolder;
 import ywl.prelude;

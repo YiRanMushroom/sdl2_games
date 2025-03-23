@@ -1,8 +1,6 @@
-module;
-
-#include <random>
-
 export module randomGenerator;
+
+import ywl.prelude;
 
 export int getRandomNumber(int min, int max) {
     std::random_device rd;

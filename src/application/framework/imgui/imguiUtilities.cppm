@@ -2,7 +2,6 @@ module;
 
 #include <imgui.h>
 #include <imgui_internal.h>
-#include <iostream>
 
 export module imguiUtilities;
 import ywl.prelude;

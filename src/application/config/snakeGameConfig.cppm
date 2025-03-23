@@ -4,7 +4,7 @@ module;
 
 export module snakeGameConfig;
 
-import std_essentials;
+import ywl.prelude;
 import json;
 
 namespace application::config::snakeGame {

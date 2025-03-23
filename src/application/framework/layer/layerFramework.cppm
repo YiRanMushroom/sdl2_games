@@ -8,9 +8,16 @@ module;
 export module layerFramework;
 export import workableLayer;
 
-import std_essentials;
+import ywl.prelude;
 import SDL2_EventListener;
 import IComponent;
+
+using std::unique_ptr;
+using std::list;
+using std::function;
+using std::runtime_error;
+using std::vector;
+using std::shared_ptr;
 
 namespace application {
     export interface IMouseMotionAutoHandler {

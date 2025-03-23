@@ -6,7 +6,6 @@ export module applicationConfig;
 import json;
 import fileUtilities;
 import applicationSharedState;
-import std_overloads;
 import snakeGameConfig;
 
 namespace application::config {

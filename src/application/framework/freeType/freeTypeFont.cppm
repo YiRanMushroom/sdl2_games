@@ -9,11 +9,16 @@ module;
 #include <algorithm>
 
 export module freeTypeFont;
-import std_essentials;
+import ywl.prelude;
 import SDL2_Utilities;
 import imguiUtilities;
-import std_overloads;
 import applicationConstants;
+
+using std::string;
+using std::string_view;
+using std::unique_ptr;
+using std::vector;
+using std::runtime_error;
 
 export class FreeTypeFontHolder {
 public:
@@ -71,7 +76,7 @@ public:
             constexpr int surfaceHeight = 1024;
 
             FT_Face face;
-            auto surface = unique_ptr<SDL_Surface, SDL2_SurfaceDestructor>{
+            auto surface = unique_ptr<SDL_Surface, ywl::basic::function_t<SDL_FreeSurface>>{
                 SDL_CreateRGBSurfaceWithFormat(0, surfaceWidth, surfaceHeight, 32, SDL_PIXELFORMAT_RGBA32)
             };
 

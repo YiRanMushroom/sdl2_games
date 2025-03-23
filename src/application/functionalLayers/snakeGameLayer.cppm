@@ -12,17 +12,24 @@ module;
 
 export module snakeGameLayer;
 
+import ywl.prelude;
 import layerFramework;
-import std_essentials;
 import snakeGameConfig;
 import imguiWindows;
-import std_overloads;
 import randomGenerator;
 import SDL2_Utilities;
 import applicationConstants;
 import textureAtlas;
 import applicationResources;
 import freeTypeFont;
+
+using std::unique_ptr;
+using std::function;
+using std::shared_ptr;
+using std::string;
+using std::unordered_set;
+using std::make_unique;
+using std::string_view;
 
 namespace application {
     export class SnakeGameLayer : public application::WorkableLayer {
@@ -44,7 +51,7 @@ namespace application {
         struct Position {
             int x, y;
 
-            [[nodiscard]] size_t hash_code() const {
+            [[nodiscard]] size_t hash_code(ywl_overload_flag_t) const {
                 return std::bit_cast<size_t>(*this);
             }
 
@@ -96,7 +103,7 @@ namespace application {
 
         unordered_set<Position> foodPositions{};
 
-        unique_ptr<SDL_Surface, SDL2_SurfaceDestructor> backGroundSurface;
+        unique_ptr<SDL_Surface, ywl::basic::function_t<SDL_FreeSurface> > backGroundSurface;
 
         Texture backGroundTexture;
 

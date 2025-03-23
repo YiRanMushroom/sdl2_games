@@ -5,9 +5,13 @@ module;
 #include <utility>
 
 export module json;
-export import std_overloads;
 
 export using nlohmann::json;
+
+export template<typename T, typename F> requires std::is_invocable_v<F, T>
+constexpr decltype(auto) operator|(T &&t, F &&f) {
+    return std::forward<F>(f)(std::forward<T>(t));
+}
 
 namespace jsonutil {
     export json parse_no_throw(std::istream &is) {
@@ -54,59 +58,4 @@ namespace jsonutil {
             }
         };
     }
-
-    // template<typename T>
-    // using return_type_of = std::remove_cvref_t<decltype([] {
-    //     using clean_type = std::remove_pointer_t<std::remove_all_extents_t<std::remove_cvref_t<T> > >;
-    //     if constexpr (std::is_same_v<decltype(char{}), decltype(clean_type{})>) {
-    //         return std::string{};
-    //     } else {
-    //         // static_assert(!std::is_same_v<decltype(char{}), decltype(clean_type{})>, "Unsupported type");
-    //         return clean_type{};
-    //     }
-    // }())>;
-    //
-    // export decltype(auto) read_or_default(auto &&default_value) {
-    //     using return_type = return_type_of<decltype(default_value)>;
-    //     return [default_value = forward_acceptor{std::forward<decltype(default_value)>(default_value)}
-    //             ](const json &j) -> return_type {
-    //         try {
-    //             return j.get<return_type>();
-    //         } catch (json::exception &) {
-    //             return default_value.forward();
-    //         }
-    //     };
-    // }
-    //
-    // export decltype(auto) read_or_default(auto &&key, auto &&... args) requires requires {
-    //     sizeof...(args) > 0;
-    // } {
-    //     using return_type = return_type_of<decltype(std::get<sizeof...(args) - 1>(std::forward_as_tuple(args...)))>;
-    //     return [key = forward_acceptor{std::forward<decltype(key)>(key)},
-    //                 tuple = std::forward_as_tuple(std::forward<decltype(args)>(args)...)]
-    //     (const json &j) -> return_type{
-    //         try {
-    //             if (j.contains(key.value)) {
-    //                 return j.at(key.value)
-    //                        | std::apply
-    //                        ([]<typename... Tp>(Tp &&... unpacked) -> return_type {
-    //                            return read_or_default(
-    //                                std::forward<Tp>(unpacked)...);
-    //                        }, tuple);
-    //             }
-    //
-    //             if constexpr (std::is_invocable_v<decltype(std::get<sizeof...(args) - 1>(tuple))>) {
-    //                 return std::get<sizeof...(args) - 1>(tuple)();
-    //             } else {
-    //                 return std::get<sizeof...(args) - 1>(tuple);
-    //             }
-    //         } catch (json::exception &) {
-    //             if constexpr (std::is_invocable_v<decltype(std::get<sizeof...(args) - 1>(tuple))>) {
-    //                 return std::get<sizeof...(args) - 1>(tuple)();
-    //             } else {
-    //                 return std::get<sizeof...(args) - 1>(tuple);
-    //             }
-    //         }
-    //     };
-    // }
 }

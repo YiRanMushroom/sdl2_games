@@ -1,14 +1,19 @@
 module;
 
-#include <SDL2/SDL_mixer.h>
+#include <SDL_mixer.h>
 #include <cassert>
 
 export module applicationResources;
 
-import std_essentials;
+import ywl.prelude;
 import fontHolder;
 import freeTypeFont;
 import workableLayer;
+
+using std::unique_ptr;
+using std::unordered_map;
+using std::string;
+using std::make_unique;
 
 namespace application {
     export unique_ptr<FontHolder> openSansHolder;

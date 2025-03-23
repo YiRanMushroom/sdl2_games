@@ -1,12 +1,16 @@
 module;
 
 #include <imgui.h>
-#include <utility>
 
 export module imguiWindows;
 
-import std_essentials;
+import ywl.prelude;
 import applicationSharedState;
+
+using std::unordered_map;
+using std::string;
+using std::function;
+using std::shared_ptr;
 
 namespace application {
     export unordered_map<string, std::pair<bool *, function<void(bool *)> > > imguiDisplayWindows;

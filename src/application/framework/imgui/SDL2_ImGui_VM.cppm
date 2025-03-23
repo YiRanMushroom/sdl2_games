@@ -1,8 +1,8 @@
 module;
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <SDL_image.h>
 #include <imgui.h>
 #include <imgui_impl_sdl2.h>
@@ -18,10 +18,16 @@ module;
 export module SDL2_ImGui_VM;
 
 import SDL2_EventListener;
-import std_essentials;
+import ywl.prelude;
 import workableLayer;
 import applicationSharedState;
 import imguiUtilities;
+
+using std::unique_ptr;
+using std::runtime_error;
+using std::function;
+using std::optional;
+using std::make_unique;
 
 struct SDL2_Context_Holder {
     SDL2_Context_Holder() {

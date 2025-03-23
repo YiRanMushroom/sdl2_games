@@ -1,13 +1,17 @@
 module;
 
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL_image.h>
 
 export module textureAtlas;
 
-import std_essentials;
+import ywl.prelude;
 import SDL2_Utilities;
 import workableLayer;
+
+using std::string_view;
+using std::unique_ptr;
+using std::runtime_error;
 
 export template<size_t sideLength, size_t totalWidth> requires (totalWidth % sideLength == 0)
 class SimpleSquareTextureAtlas {
@@ -17,7 +21,9 @@ public:
     SimpleSquareTextureAtlas() = default;
 
     SimpleSquareTextureAtlas(string_view resourceLocation, SDL_Renderer *renderer) {
-        unique_ptr<SDL_Surface, SDL2_SurfaceDestructor> surface{
+        unique_ptr<SDL_Surface,
+        ywl::basic::function_t<SDL_FreeSurface>
+        > surface{
             IMG_Load(resourceLocation.data())
         };
 

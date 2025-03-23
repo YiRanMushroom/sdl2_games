@@ -1,17 +1,24 @@
 module;
 
-#include <SDL2/SDL_ttf.h>
+#include <SDL_ttf.h>
 #include <utility>
 
 export module fontHolder;
-import std_essentials;
-import std_overloads;
+import ywl.prelude;
 import SDL2_Utilities;
 
 export import SDL2_Utilities;
 
+using std::string;
+using std::string_view;
+using std::unique_ptr;
+using std::unordered_map;
+using std::runtime_error;
+
 export class FontHolder {
-    unordered_map<int32_t, unique_ptr<TTF_Font, SDL2_FontDestructor> > fonts{};
+    unordered_map<int32_t, unique_ptr<TTF_Font,
+    ywl::basic::function_t<TTF_CloseFont>
+    > > fonts{};
     const string fontPath;
 
 public:
@@ -34,7 +41,7 @@ public:
             throw runtime_error(TTF_GetError());
         }
 
-        fonts[fontSize] = unique_ptr<TTF_Font, SDL2_FontDestructor>(font);
+        fonts[fontSize] = unique_ptr<TTF_Font, ywl::basic::function_t<TTF_CloseFont>>(font);
         return font;
     }
 
@@ -51,10 +58,10 @@ public:
             to allow implicit load set FontHolder::allowImplicitLoad to true)"_fmt(fontSize));
     }
 
-    unique_ptr<SDL_Surface, SDL2_SurfaceDestructor> getSurfaceBlended(int32_t fontSize, string_view text,
+    unique_ptr<SDL_Surface, ywl::basic::function_t<SDL_FreeSurface>> getSurfaceBlended(int32_t fontSize, string_view text,
                                                                       SDL_Color color) {
         auto font = (*this)[fontSize];
-        auto surface = unique_ptr<SDL_Surface, SDL2_SurfaceDestructor>
+        auto surface = unique_ptr<SDL_Surface, ywl::basic::function_t<SDL_FreeSurface>>
                 (TTF_RenderText_Blended(font, text.data(), color));
         if (!surface) {
             throw runtime_error(TTF_GetError());

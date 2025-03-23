@@ -7,14 +7,13 @@ module;
 
 export module application;
 
-import std_essentials;
+import ywl.prelude;
 import SDL2_EventListener;
 import SDL2_ImGui_VM;
 import appEventListener;
 import applicationSharedState;
 import fileUtilities;
 import applicationConfig;
-import std_overloads;
 import fontHolder;
 import SDL2_Utilities;
 import IComponent;
@@ -25,7 +24,9 @@ import appMenuLayer;
 import applicationBasicLayers;
 import freeTypeFont;
 
-int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
+using std::make_unique;
+
+export int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
     application::config::loadApplicationSettings();
 
     auto vm = application::SDL2_ImGUi_VM_Factory{}
@@ -57,8 +58,6 @@ int application_main([[maybe_unused]] int argc, [[maybe_unused]] char *argv[]) {
         vm.postEventListening();
 
         vm.render();
-
-        // fontAtlas.renderCenteredMultiLine(vm.getRenderer(), "Hello, World!aldfjasdldjfgfsdfgasgl\nasjdfl", 100, 100, 500, 48);
 
         SDL_RenderPresent(vm.getRenderer());
 

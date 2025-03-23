@@ -2,14 +2,19 @@ module;
 
 #include <memory>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 
 export module SDL2_Utilities;
 
-import std_essentials;
+import ywl.prelude;
 
-export struct SDL2_FontDestructor {
+using std::unique_ptr;
+using std::runtime_error;
+using std::optional;
+using std::shared_ptr;
+
+/*export struct SDL2_FontDestructor {
     static void operator()(TTF_Font *font) {
         TTF_CloseFont(font);
     }
@@ -25,38 +30,10 @@ export struct SDL2_TextureDestructor {
     static void operator()(SDL_Texture *texture) {
         SDL_DestroyTexture(texture);
     }
-};
-
-// export SDL_Rect SDL2_GetRectCentAbsolute(float xRatio, float yRatio, int width, int height,
-//                                          SDL_Window *window) {
-//     int windowWidth, windowHeight;
-//     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
-//
-//     return {
-//         static_cast<int>((windowWidth - width) * xRatio),
-//         static_cast<int>((windowHeight - height) * yRatio),
-//         width, height
-//     };
-// }
-//
-// export SDL_Rect SDL2_GetRectCentRelative(float xRatio, float yRatio, float widthRatio, float aspectRatio,
-//                                          SDL_Window *window) {
-//     int windowWidth = 0, windowHeight = 0;
-//
-//     SDL_GetWindowSize(window, &windowWidth, &windowHeight);
-//
-//     int width = static_cast<int>(windowWidth * widthRatio);
-//     int height = static_cast<int>(width / aspectRatio);
-//
-//     return {
-//         static_cast<int>((windowWidth - width) * xRatio),
-//         static_cast<int>((windowHeight - height) * yRatio),
-//         width, height
-//     };
-// }
+};*/
 
 export class Texture {
-    unique_ptr<SDL_Texture, SDL2_TextureDestructor> texture; // NOLINT
+    unique_ptr<SDL_Texture, ywl::basic::function_t<SDL_DestroyTexture>> texture; // NOLINT
     int32_t width{};
     int32_t height{};
 
@@ -65,7 +42,7 @@ public:
 
     Texture() = default;
 
-    Texture(unique_ptr<SDL_Texture, SDL2_TextureDestructor> texture, int32_t width, int32_t height)
+    Texture(unique_ptr<SDL_Texture, ywl::basic::function_t<SDL_DestroyTexture>> texture, int32_t width, int32_t height)
         : texture(std::move(texture)), width(width), height(height) {}
 
     Texture &operator=(const Texture &) = delete;
@@ -82,7 +59,7 @@ public:
         }
 
         return {
-            unique_ptr<SDL_Texture, SDL2_TextureDestructor>{sdl_texture},
+            unique_ptr<SDL_Texture, ywl::basic::function_t<SDL_DestroyTexture>>{sdl_texture},
             surface->w, surface->h
         };
     }
@@ -120,7 +97,7 @@ export void SDL2_RenderTextureClippedRect(SDL_Renderer *renderer, const Texture 
 export Texture SDL2_Create_Solid_Color_Texture(SDL_Color color,
                                                SDL_Renderer *renderer, int width = 128, int height = 128) {
     // Create an SDL_Surface with the specified width, height, and color depth
-    auto surface = unique_ptr<SDL_Surface, SDL2_SurfaceDestructor>{
+    auto surface = unique_ptr<SDL_Surface, ywl::basic::function_t<SDL_FreeSurface>>{
         SDL_CreateRGBSurface(0, width, height, 32, 0x00FF0000,
                              0x0000FF00, 0x000000FF, 0xFF000000)
     };
@@ -132,7 +109,7 @@ export Texture SDL2_Create_Solid_Color_Texture(SDL_Color color,
     SDL_FillRect(surface.get(), nullptr, SDL_MapRGBA(surface->format, color.r, color.g, color.b, color.a));
 
     // Create a texture from the surface
-    auto texture = unique_ptr<SDL_Texture, SDL2_TextureDestructor>
+    auto texture = unique_ptr<SDL_Texture, ywl::basic::function_t<SDL_DestroyTexture>>
             {SDL_CreateTextureFromSurface(renderer, surface.get())};
     if (!texture) {
         throw runtime_error(SDL_GetError());
@@ -265,7 +242,7 @@ public:
         }
 
         return {
-            shared_ptr<SDL_Texture>{sdl_texture, SDL2_TextureDestructor{}},
+            shared_ptr<SDL_Texture>{sdl_texture, SDL_DestroyTexture},
             surface->w, surface->h
         };
     }

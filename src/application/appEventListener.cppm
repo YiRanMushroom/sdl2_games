@@ -7,7 +7,6 @@ export module appEventListener;
 import SDL2_EventListener;
 import applicationSharedState;
 import imguiUtilities;
-import std_overloads;
 
 // export class AppEventListener : public SDL2_EventListener {
 //     // bool onQuit(const SDL_Event &, bool) override {

@@ -27,7 +27,7 @@ using std::string_view;
 
 namespace application {
     export class SnakeGameLayer : public application::WorkableLayer {
-        function<void()> m_onDestruct;
+        ywl::basic::move_only_function<void()> m_onDestruct;
         shared_ptr<string> imguiWindowHolder;
 
         inline static bool showSnakeGameLayerWindow = false;
@@ -190,7 +190,7 @@ namespace application {
             snakeLengthTask.offsetY = (windowHeight - snakeLengthTask.h) * 3 / 4;
         }
 
-        SnakeGameLayer(function<void()> onDestruct, IVirtualMachineContextProvider &provider) : m_onDestruct( // NOLINT
+        SnakeGameLayer(ywl::basic::move_only_function<void()> onDestruct, IVirtualMachineContextProvider &provider) : m_onDestruct( // NOLINT
             std::move(onDestruct)) {
             imguiWindowHolder = addImGuiDisplayWindow(
                 "Snake Game Layer", &showSnakeGameLayerWindow,

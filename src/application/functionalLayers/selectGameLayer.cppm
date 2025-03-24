@@ -14,12 +14,11 @@ import applicationConstants;
 import snakeGameLayer;
 import Components;
 
-using std::function;
 using std::make_shared;
 
 namespace application {
     export class SelectGameLayer : public application::WorkableLayer {
-        function<void()> m_onDestruct;
+        ywl::basic::move_only_function<void()> m_onDestruct;
         application::components::LayerComponentHolder holder;
     public:
 
@@ -33,7 +32,7 @@ namespace application {
 
         SelectGameLayer &operator=(const SelectGameLayer &) = delete;
 
-        SelectGameLayer(IVirtualMachineContextProvider &provider, function<void()> destructor) : m_onDestruct(
+        SelectGameLayer(IVirtualMachineContextProvider &provider, ywl::basic::move_only_function<void()> destructor) : m_onDestruct(
                 std::move(destructor)) {
             auto &&fontHolder = *application::openSansHolder;
             auto texture = fontHolder.getTextureBlended(50, "SNAKE",
@@ -58,7 +57,7 @@ namespace application {
                                                  [&provider, currentIterator = provider.getCurrentIterator(), this] {
                                                      provider.getLayers().insert(
                                                              currentIterator,
-                                                             make_unique<SnakeGameLayer>(
+                                                             std::make_unique<SnakeGameLayer>(
                                                                      std::move(
                                                                              m_onDestruct),
                                                                      provider));

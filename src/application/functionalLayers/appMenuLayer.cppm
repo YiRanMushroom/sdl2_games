@@ -38,6 +38,8 @@ namespace application {
                     .whenPressed([&provider, this](int button) {
                         AppLogMessage("Select Game: Button clicked with button: {}"_fmt(button));
 
+                        ywl::utils::print_ln("Layer has been disabled").flush();
+
                         this->m_state = LayerState::disabled;
 
                         provider.getDeferredTasks().emplace(
@@ -45,12 +47,12 @@ namespace application {
                                     provider.getLayers().insert(
                                             std::next(currentIterator),
                                             make_unique<SelectGameLayer>(provider, [this] {
+                                                ywl::utils::print_ln("Layer has been enabled").flush();
                                                 this->m_state = LayerState::enabled;
                                             }));
                                 });
                     })
                     .build(provider.getRenderer(), provider.getWindow());
-//            registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(selectGameButton)));
 
             components::addComponentToHandler(holder,
                                               std::make_unique<SimpleConstantTextButton>(std::move(selectGameButton)));
@@ -63,7 +65,6 @@ namespace application {
                         AppLogMessage("Config: Button clicked with button: {}"_fmt(button));
                     })
                     .build(provider.getRenderer(), provider.getWindow());
-//            registerBasicMouseRenderableComponents(make_shared<SimpleConstantTextButton>(std::move(configButton)));
 
             components::addComponentToHandler(holder,
                                               std::make_unique<SimpleConstantTextButton>(std::move(configButton)));
